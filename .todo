@@ -1,0 +1,27 @@
+GENERAL DESIGN:
+    PLAYER:
+        ☐ Visual design.
+        ✔ Movement design. @done(20-11-27 20:08)
+            It's update rate should be the same as the screen's, unlike the terrain
+             which moves "forward" every terrain_update_time milliseconds.
+            It only changes it's vertical position.
+
+    TERRAIN:
+        ☐ Visual design.
+            Column based (one column is a unit). Each unit should be related
+             to the previous one.
+        ✔ Functional design. @done(20-11-27 20:08)
+            Should be smaller in lenght to the actual window and up to MAX_ROWS rows tall.
+            It's moving speed should increase from START_SPEED to MAX_SPEED as the player
+             progresses.
+            Should vary in height, creating the illusion that the player's climbing/descending
+             a mountain (or something else).
+
+    OBSTACLES:
+        ☐ Visual design.
+            ☐ Types.
+        ✔ Functional design. @done(20-11-27 20:11)
+            Should be related somehow to the previous one and the terrain.
+            There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
+            Obstacle spawn offset is determined by new_obstacle_distance, which depends
+             on min_obstacle_distance.
