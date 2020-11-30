@@ -2,9 +2,14 @@
 
 extern crate ncurses;
 extern crate chrono;
+extern crate rand;
 
 use ncurses::*;
 use chrono::*;
+use rand::seq::SliceRandom;
+
+const IY: i32 = 4;
+const IX: i32 = 1;
 
 #[derive(Copy, Clone)]
 struct TerrainTile {
@@ -12,8 +17,17 @@ struct TerrainTile {
 }
 
 #[derive(Copy, Clone)]
+enum TerrainType {
+    Flat,
+    Up,
+    Down,
+}
+
+#[derive(Copy, Clone)]
 struct TerrainUnit {
     tiles: [TerrainTile; 3],
+    unit_type: TerrainType,
+    initial_y: i32,
 }
 
 
@@ -24,39 +38,89 @@ impl TerrainTile {
 }
 
 impl TerrainUnit {
-    fn new() -> TerrainUnit {
+    fn new_flat(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
                 TerrainTile::new('_'),
                 TerrainTile::new('.'),
                 TerrainTile::new('.'),
-            ]
+            ],
+            unit_type: TerrainType::Flat,
+            initial_y: iy,
         }
     }
-    fn new2() -> TerrainUnit {
+    fn new_up(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('_'),
-                TerrainTile::new('2'),
+                TerrainTile::new('/'),
                 TerrainTile::new('.'),
-            ]
+                TerrainTile::new('.'),
+                ],
+            unit_type: TerrainType::Up,
+            initial_y: iy,
         }
     }
-    fn new3() -> TerrainUnit {
+    fn new_down(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('_'),
+                TerrainTile::new('\\'),
                 TerrainTile::new('.'),
-                TerrainTile::new('k'),
-            ]
+                TerrainTile::new('.'),
+            ],
+            unit_type: TerrainType::Down,
+            initial_y: iy,
         }
+    }
+
+    fn generate_next_tile(previous: &TerrainUnit, dist_since_last_incl: u32, min_dist: u32) -> TerrainUnit {
+        let next_unit_type: TerrainType;
+        let mut rng = rand::thread_rng();
+
+        if dist_since_last_incl >= min_dist {
+            next_unit_type = match previous.unit_type {
+                TerrainType::Flat => {
+                    *[
+                        TerrainType::Flat,
+                        TerrainType::Up,
+                        TerrainType::Down,
+                    ].choose(&mut rng).unwrap()
+                },
+                _ => TerrainType::Flat,
+            }
+        } else {
+            next_unit_type = TerrainType::Flat;
+        }
+
+        let mut next_unit: TerrainUnit = match next_unit_type {
+            TerrainType::Flat => TerrainUnit::new_flat(previous.initial_y),
+            TerrainType::Up   => TerrainUnit::new_up(previous.initial_y),
+            TerrainType::Down => TerrainUnit::new_down(previous.initial_y + 1),
+        };
+
+        match previous.unit_type {
+            TerrainType::Up => next_unit.initial_y -= 1,
+            _ => {},
+        };
+
+        next_unit
     }
 }
 
 
-fn scroll_terrain(t: &mut Vec<TerrainUnit >) {
-    let first = t.remove(0);
-    t.push(first);
+fn scroll_terrain(t: &mut Vec<TerrainUnit>, dist_since_last_incl: u32, min_dist: u32) -> u32 {
+    let last: TerrainUnit = *t.last_mut().unwrap();
+    let next: TerrainUnit = TerrainUnit::generate_next_tile(
+                                &last,
+                                dist_since_last_incl,
+                                min_dist
+                            );
+    t.remove(0);
+    t.push(next);
+
+    match next.unit_type {
+        TerrainType::Flat => dist_since_last_incl + 1,
+        _ => 0,
+    }
 }
 
 fn main() {
@@ -66,49 +130,38 @@ fn main() {
     nodelay(stdscr(), true);
     noecho();
 
-    const IY: i32 = 4;
-    const IX: i32 = 1;
-    const PX: i32 = 20;
-
-    let mut terrain: Vec<TerrainUnit> = Vec::new();
-
-    for i in 0..COLS() - 1 {
-        if i % 3 == 0 {
-            terrain.push(TerrainUnit::new())
-        } else if i % 2 == 0 {
-            terrain.push(TerrainUnit::new2())
-        } else {
-            terrain.push(TerrainUnit::new3())
-        }
-    }
-
+    let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY); (COLS() + COLS() / 3 ) as usize);
     let mut last_time = offset::Local::now();
+    let mut dist_since_last_incl: u32 = 0;
 
     loop {
-        clear();
-        mv(IY, IX);
-
-        for i in 0..3 {
-            for terrain_unit in terrain.iter() {
-                addch(terrain_unit.tiles[i].tile_char);
-            }
-            mv(IY + 1 + i as i32, IX);
-        }
-
-        mvprintw(IY - 1, PX, &"A");
-        mvprintw(IY, PX, &"V");
-        refresh();
-
         let c = getch();
-
         if c == 'q' as i32 {
             break
         }
 
         let t = offset::Local::now();
         if t >= last_time + Duration::milliseconds(100) {
-            scroll_terrain(&mut terrain);
+            dist_since_last_incl = scroll_terrain(
+                                        &mut terrain,
+                                        dist_since_last_incl,
+                                        13
+                                   );
             last_time = t;
+            clear();
+            mv(IY, IX);
+
+            for j in 0..COLS() - 1 {
+                for i in 0..3 {
+                    mvaddch(
+                        terrain[j as usize].initial_y + i,
+                        IX + j,
+                        terrain[j as usize].tiles[i as usize].tile_char
+                    );
+                }
+            }
+
+            refresh();
         }
     }
 

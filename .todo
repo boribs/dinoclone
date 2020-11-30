@@ -2,31 +2,28 @@ GENERAL DESIGN:
     PLAYER:
         ☐ Visual design.
         ✔ Movement design. @done(20-11-27 20:08)
-            It's update rate should be the same as the screen's, unlike the terrain
-             which moves "forward" every terrain_update_time milliseconds.
-            It only changes it's vertical position.
+            * It's update rate should be the same as the screen's, unlike the terrain which moves "forward" every terrain_update_time milliseconds.
+            * It only changes it's vertical position.
 
     TERRAIN:
         ☐ Visual design.
-            Column based (one column is a unit). Each unit should be related
-             to the previous one.
+            *Column based (one column is a unit). Each unit should be related to the previous one.
         ✔ Functional design. @done(20-11-27 20:08)
-            Should be smaller in lenght to the actual window and up to MAX_ROWS rows tall.
-            It's moving speed should increase from START_SPEED to MAX_SPEED as the player
-             progresses.
-            Should vary in height, creating the illusion that the player's climbing/descending
-             a mountain (or something else).
-        ☐ Terrain generator.
+            * Should be smaller in lenght to the actual window and up to MAX_ROWS rows tall.
+            * It's moving speed should increase from START_SPEED to MAX_SPEED as the player progresses.
+            * Should vary in height, creating the illusion that the player's climbing/descending a mountain (or something else).
+        ✔ Terrain generator. @started(20-11-30 12:02) @done(20-11-30 14:27) @lasted(2h25m46s)
+            ☐ Generate more than one tile at a time.
         ✔ Terrain "mover". @done(20-11-30 10:44)
             ✔ First attempt: Chrono. @done(20-11-30 10:43)
-                Basically, inside a loop, constantly check if n ammount of time has passed.
-                I'm sticking with this implementation
+                * Basically, inside a loop, constantly check if n ammount of time has passed.
+                * I'm sticking with this implementation, for now.
+        ✔ Terrain height offset. @done(20-11-30 16:17)
 
     OBSTACLES:
         ☐ Visual design.
             ☐ Types.
         ✔ Functional design. @done(20-11-27 20:11)
-            Should be related somehow to the previous one and the terrain.
-            There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
-            Obstacle spawn offset is determined by new_obstacle_distance, which depends
-             on min_obstacle_distance.
+            * Should be related somehow to the previous one and the terrain.
+            * There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
+            * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
