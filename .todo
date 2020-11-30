@@ -16,6 +16,11 @@ GENERAL DESIGN:
              progresses.
             Should vary in height, creating the illusion that the player's climbing/descending
              a mountain (or something else).
+        ☐ Terrain generator.
+        ✔ Terrain "mover". @done(20-11-30 10:44)
+            ✔ First attempt: Chrono. @done(20-11-30 10:43)
+                Basically, inside a loop, constantly check if n ammount of time has passed.
+                I'm sticking with this implementation
 
     OBSTACLES:
         ☐ Visual design.
