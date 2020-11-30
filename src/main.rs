@@ -66,6 +66,9 @@ fn main() {
     nodelay(stdscr(), true);
     noecho();
 
+    const IY: i32 = 4;
+    const IX: i32 = 1;
+    const PX: i32 = 20;
 
     let mut terrain: Vec<TerrainUnit> = Vec::new();
 
@@ -84,19 +87,18 @@ fn main() {
     loop {
         for x in 0..terrain.len() {
             clear();
-            mv(3, 1);
+            mv(IY, IX);
 
             for i in 0..3 {
                 for j in 0..=x {
                     addch(terrain[j].tiles[i].tile_char);
                 }
-                addch('\n' as u32);
-                mv(4 + i as i32, 1);
+                mv(IY + 1 + i as i32, IX);
             }
-            addch('\n' as u32);
+            mv(IY, IX);
         }
-        mvprintw(2, 20, &"A");
-        mvprintw(3, 20, &"V");
+        mvprintw(IY - 1, PX, &"A");
+        mvprintw(IY, PX, &"V");
         refresh();
 
         let c = getch();
