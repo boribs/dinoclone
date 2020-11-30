@@ -12,7 +12,7 @@ struct TerrainTile {
 }
 
 #[derive(Copy, Clone)]
-struct Terrain {
+struct TerrainUnit {
     tiles: [TerrainTile; 3],
 }
 
@@ -23,9 +23,9 @@ impl TerrainTile {
     }
 }
 
-impl Terrain {
-    fn new() -> Terrain {
-        Terrain {
+impl TerrainUnit {
+    fn new() -> TerrainUnit {
+        TerrainUnit {
             tiles: [
                 TerrainTile::new('_'),
                 TerrainTile::new('.'),
@@ -33,8 +33,8 @@ impl Terrain {
             ]
         }
     }
-    fn new2() -> Terrain {
-        Terrain {
+    fn new2() -> TerrainUnit {
+        TerrainUnit {
             tiles: [
                 TerrainTile::new('_'),
                 TerrainTile::new('2'),
@@ -42,8 +42,8 @@ impl Terrain {
             ]
         }
     }
-    fn new3() -> Terrain {
-        Terrain {
+    fn new3() -> TerrainUnit {
+        TerrainUnit {
             tiles: [
                 TerrainTile::new('_'),
                 TerrainTile::new('.'),
@@ -54,7 +54,7 @@ impl Terrain {
 }
 
 
-fn scroll_terrain(t: &mut Vec<Terrain>) {
+fn scroll_terrain(t: &mut Vec<TerrainUnit >) {
     let first = t.remove(0);
     t.push(first);
 }
@@ -67,14 +67,15 @@ fn main() {
     noecho();
 
 
-    let mut terrain: Vec<Terrain> = Vec::new();
+    let mut terrain: Vec<TerrainUnit> = Vec::new();
+
     for i in 0..COLS() - 1 {
         if i % 3 == 0 {
-            terrain.push(Terrain::new())
+            terrain.push(TerrainUnit::new())
         } else if i % 2 == 0 {
-            terrain.push(Terrain::new2())
+            terrain.push(TerrainUnit::new2())
         } else {
-            terrain.push(Terrain::new3())
+            terrain.push(TerrainUnit::new3())
         }
     }
 
