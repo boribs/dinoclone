@@ -131,6 +131,8 @@ fn main() {
     nodelay(stdscr(), true);
     noecho();
 
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+
     let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY); (COLS() + COLS() / 3 ) as usize);
     let mut last_time = offset::Local::now();
     let mut dist_since_last_incl: u32 = 0;
