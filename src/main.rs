@@ -10,6 +10,7 @@ use rand::seq::SliceRandom;
 
 const IY: i32 = 4;
 const IX: i32 = 1;
+const PX: i32 = 10;
 
 #[derive(Copy, Clone)]
 struct TerrainTile {
@@ -133,6 +134,7 @@ fn main() {
     let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY); (COLS() + COLS() / 3 ) as usize);
     let mut last_time = offset::Local::now();
     let mut dist_since_last_incl: u32 = 0;
+    let mut offset_y: i32 = 0;
 
     loop {
         let c = getch();
@@ -148,19 +150,26 @@ fn main() {
                                         13
                                    );
             last_time = t;
+
+            offset_y += match terrain[PX as usize].unit_type {
+                TerrainType::Flat =>  0,
+                TerrainType::Up   =>  1,
+                TerrainType::Down => -1,
+            };
+
             clear();
             mv(IY, IX);
-
             for j in 0..COLS() - 1 {
                 for i in 0..3 {
                     mvaddch(
-                        terrain[j as usize].initial_y + i,
+                        terrain[j as usize].initial_y + i + offset_y,
                         IX + j,
                         terrain[j as usize].tiles[i as usize].tile_char
                     );
                 }
             }
 
+            mvaddch(IY, PX, '$' as u32);
             refresh();
         }
     }
