@@ -85,18 +85,16 @@ fn main() {
     let mut last_time = offset::Local::now();
 
     loop {
-        for x in 0..terrain.len() {
-            clear();
-            mv(IY, IX);
+        clear();
+        mv(IY, IX);
 
-            for i in 0..3 {
-                for j in 0..=x {
-                    addch(terrain[j].tiles[i].tile_char);
-                }
-                mv(IY + 1 + i as i32, IX);
+        for i in 0..3 {
+            for terrain_unit in terrain.iter() {
+                addch(terrain_unit.tiles[i].tile_char);
             }
-            mv(IY, IX);
+            mv(IY + 1 + i as i32, IX);
         }
+
         mvprintw(IY - 1, PX, &"A");
         mvprintw(IY, PX, &"V");
         refresh();
