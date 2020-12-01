@@ -8,9 +8,12 @@ use ncurses::*;
 use chrono::*;
 use rand::seq::SliceRandom;
 
-const IY: i32 = 4;
+
+const IY: i32 = 5;
 const IX: i32 = 1;
-const PX: i32 = 10;
+const PX: i32 = 23;
+const MIN_T_DIST: u32 = 45;
+
 
 #[derive(Copy, Clone)]
 struct TerrainTile {
@@ -149,7 +152,7 @@ fn main() {
             dist_since_last_incl = scroll_terrain(
                                         &mut terrain,
                                         dist_since_last_incl,
-                                        13
+                                        MIN_T_DIST
                                    );
             last_time = t;
 
