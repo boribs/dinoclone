@@ -53,6 +53,7 @@ impl TerrainUnit {
             initial_y: iy,
         }
     }
+
     fn new_up(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
@@ -64,6 +65,7 @@ impl TerrainUnit {
             initial_y: iy,
         }
     }
+
     fn new_down(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
@@ -109,7 +111,6 @@ impl TerrainUnit {
         next_unit
     }
 }
-
 
 fn scroll_terrain(t: &mut Vec<TerrainUnit>, dist_since_last_incl: u32, min_dist: u32) -> u32 {
     let last: TerrainUnit = *t.last_mut().unwrap();
