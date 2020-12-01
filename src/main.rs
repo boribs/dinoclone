@@ -136,7 +136,20 @@ fn main() {
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
 
-    let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY); (COLS() + COLS() / 3 ) as usize);
+    let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY); COLS() as usize);
+    terrain.push(
+        TerrainUnit {
+            tiles: [
+                TerrainTile::new('_'),
+                TerrainTile::new('#'),
+                TerrainTile::new('#'),
+            ],
+            unit_type: TerrainType::Flat,
+            initial_y: IY,
+        }
+    );
+    terrain.append(&mut vec!(TerrainUnit::new_flat(IY); COLS() as usize / 6));
+
     let mut last_time = offset::Local::now();
     let mut dist_since_last_incl: u32 = 0;
     let mut offset_y: i32 = 0;
