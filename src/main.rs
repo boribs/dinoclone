@@ -60,7 +60,7 @@ impl TerrainUnit {
                 TerrainTile::new('/'),
                 TerrainTile::new('.'),
                 TerrainTile::new('.'),
-                ],
+            ],
             unit_type: TerrainType::Up,
             initial_y: iy,
         }
@@ -77,44 +77,44 @@ impl TerrainUnit {
             initial_y: iy,
         }
     }
+}
 
-    fn generate_next_tile(previous: &TerrainUnit, dist_since_last_incl: u32, min_dist: u32) -> TerrainUnit {
-        let next_unit_type: TerrainType;
-        let mut rng = rand::thread_rng();
+fn generate_next_tile(previous: &TerrainUnit, dist_since_last_incl: u32, min_dist: u32) -> TerrainUnit {
+    let next_unit_type: TerrainType;
+    let mut rng = rand::thread_rng();
 
-        if dist_since_last_incl >= min_dist {
-            next_unit_type = match previous.unit_type {
-                TerrainType::Flat => {
-                    *[
-                        TerrainType::Flat,
-                        TerrainType::Up,
-                        TerrainType::Down,
-                    ].choose(&mut rng).unwrap()
-                },
-                _ => TerrainType::Flat,
-            }
-        } else {
-            next_unit_type = TerrainType::Flat;
+    if dist_since_last_incl >= min_dist {
+        next_unit_type = match previous.unit_type {
+            TerrainType::Flat => {
+                *[
+                    TerrainType::Flat,
+                    TerrainType::Up,
+                    TerrainType::Down,
+                ].choose(&mut rng).unwrap()
+            },
+            _ => TerrainType::Flat,
         }
-
-        let mut next_unit: TerrainUnit = match next_unit_type {
-            TerrainType::Flat => TerrainUnit::new_flat(previous.initial_y),
-            TerrainType::Up   => TerrainUnit::new_up(previous.initial_y),
-            TerrainType::Down => TerrainUnit::new_down(previous.initial_y + 1),
-        };
-
-        match previous.unit_type {
-            TerrainType::Up => next_unit.initial_y -= 1,
-            _ => {},
-        };
-
-        next_unit
+    } else {
+        next_unit_type = TerrainType::Flat;
     }
+
+    let mut next_unit: TerrainUnit = match next_unit_type {
+        TerrainType::Flat => TerrainUnit::new_flat(previous.initial_y),
+        TerrainType::Up   => TerrainUnit::new_up(previous.initial_y),
+        TerrainType::Down => TerrainUnit::new_down(previous.initial_y + 1),
+    };
+
+    match previous.unit_type {
+        TerrainType::Up => next_unit.initial_y -= 1,
+        _ => {},
+    };
+
+    next_unit
 }
 
 fn scroll_terrain(t: &mut Vec<TerrainUnit>, dist_since_last_incl: u32, min_dist: u32) -> u32 {
     let last: TerrainUnit = *t.last_mut().unwrap();
-    let next: TerrainUnit = TerrainUnit::generate_next_tile(
+    let next: TerrainUnit = generate_next_tile(
                                 &last,
                                 dist_since_last_incl,
                                 min_dist
