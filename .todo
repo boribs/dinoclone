@@ -10,6 +10,7 @@ GENERAL DESIGN:
         ✔ Jumping. @done(20-12-01 19:33)
             * Remember the offset during the jump
             * During the fall, the ground must move to keep the player at the same height: that means that the player only moves up or down from IY to IY - MAX_JUMP_HEIGHT.
+        ☐ Obstacle collision.
 
     TERRAIN:
         ☐ Visual design.
@@ -37,7 +38,7 @@ GENERAL DESIGN:
             * Should be related somehow to the previous one and the terrain.
             * There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
             * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
-        ☐ Spawn.
+        ✔ Spawn. @done(20-12-02 00:43)
 
     ☐ Score?
     ☐ Extended ASCII table for more characters.
