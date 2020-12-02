@@ -10,11 +10,13 @@ use rand::seq::SliceRandom;
 
 
 const PLAYER_CHAR: u32 = '$' as u32;
+const OBSTACLE_CHAR: u32 = '#' as u32;
 const MAX_JUMP_HEIGHT: i32 = 3;
 const IY: i32 = 5;
 const IX: i32 = 1;
 const PX: i32 = 23;
 const MIN_T_DIST: u32 = 10;
+const MIN_O_DIST: u32 = 30;
 
 
 #[derive(Copy, Clone)]
@@ -34,6 +36,7 @@ struct TerrainUnit {
     tiles: [TerrainTile; 3],
     unit_type: TerrainType,
     initial_y: i32,
+    obstacle: bool,
 }
 
 impl TerrainTile {
@@ -43,7 +46,7 @@ impl TerrainTile {
 }
 
 impl TerrainUnit {
-    fn new_flat(iy: i32) -> TerrainUnit {
+    fn new_flat(iy: i32, obstacle: bool) -> TerrainUnit {
         TerrainUnit {
             tiles: [
                 TerrainTile::new('_'),
@@ -52,6 +55,7 @@ impl TerrainUnit {
             ],
             unit_type: TerrainType::Flat,
             initial_y: iy,
+            obstacle: obstacle
         }
     }
 
@@ -64,6 +68,7 @@ impl TerrainUnit {
             ],
             unit_type: TerrainType::Up,
             initial_y: iy,
+            obstacle: false,
         }
     }
 
@@ -76,6 +81,7 @@ impl TerrainUnit {
             ],
             unit_type: TerrainType::Down,
             initial_y: iy,
+            obstacle: false,
         }
     }
 }
@@ -131,7 +137,13 @@ impl Player {
     }
 }
 
-fn generate_next_tile(previous: &TerrainUnit, dist_since_last_incl: u32, min_dist: u32) -> TerrainUnit {
+fn generate_next_tile(
+    previous: &TerrainUnit,
+    dist_since_last_incl: u32,
+    min_dist: u32,
+    dist_since_last_obst: u32,
+) -> TerrainUnit {
+
     let next_unit_type: TerrainType;
     let mut rng = rand::thread_rng();
 
@@ -151,7 +163,7 @@ fn generate_next_tile(previous: &TerrainUnit, dist_since_last_incl: u32, min_dis
     }
 
     let mut next_unit: TerrainUnit = match next_unit_type {
-        TerrainType::Flat => TerrainUnit::new_flat(previous.initial_y),
+        TerrainType::Flat => TerrainUnit::new_flat(previous.initial_y, *[true, false].choose(&mut rng).unwrap()),
         TerrainType::Up   => TerrainUnit::new_up(previous.initial_y),
         TerrainType::Down => TerrainUnit::new_down(previous.initial_y + 1),
     };
@@ -164,12 +176,17 @@ fn generate_next_tile(previous: &TerrainUnit, dist_since_last_incl: u32, min_dis
     next_unit
 }
 
-fn scroll_terrain(t: &mut Vec<TerrainUnit>, dist_since_last_incl: u32, min_dist: u32) -> u32 {
+fn scroll_terrain(t: &mut Vec<TerrainUnit>,
+                    dist_since_last_incl: u32,
+                    min_dist: u32,
+                    dist_since_last_obst: u32,
+                ) -> u32 {
     let last: TerrainUnit = *t.last_mut().unwrap();
     let next: TerrainUnit = generate_next_tile(
                                 &last,
                                 dist_since_last_incl,
-                                min_dist
+                                min_dist,
+                                dist_since_last_obst,
                             );
     t.remove(0);
     t.push(next);
@@ -189,7 +206,7 @@ fn main() {
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
 
-    let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY); COLS() as usize);
+    let mut terrain: Vec<TerrainUnit> = vec!(TerrainUnit::new_flat(IY, false); COLS() as usize);
     terrain.push(
         TerrainUnit {
             tiles: [
@@ -199,9 +216,10 @@ fn main() {
             ],
             unit_type: TerrainType::Flat,
             initial_y: IY,
+            obstacle: false,
         }
     );
-    terrain.append(&mut vec!(TerrainUnit::new_flat(IY); COLS() as usize / 6));
+    terrain.append(&mut vec!(TerrainUnit::new_flat(IY, false); COLS() as usize / 6));
     let mut player: Player = Player {
         y_pos: IY,
         state: PlayerState::Running,
@@ -226,7 +244,8 @@ fn main() {
             dist_since_last_incl = scroll_terrain(
                                         &mut terrain,
                                         dist_since_last_incl,
-                                        MIN_T_DIST
+                                        MIN_T_DIST,
+                                        0
                                    );
             last_time = t;
 
@@ -250,7 +269,15 @@ fn main() {
                     mvaddch(
                         terrain[j as usize].initial_y + i + offset_y,
                         IX + j,
-                        terrain[j as usize].tiles[i as usize].tile_char
+                        terrain[j as usize].tiles[i as usize].tile_char,
+                    );
+                }
+
+                if terrain[j as usize].obstacle {
+                    mvaddch(
+                        terrain[j as usize].initial_y + offset_y,
+                        IX + j,
+                        OBSTACLE_CHAR,
                     );
                 }
             }

@@ -6,10 +6,10 @@ GENERAL DESIGN:
         ✔ Movement design. @done(20-11-27 20:08)
             * It's update rate should be the same as the screen's, unlike the terrain which moves "forward" every terrain_update_time milliseconds.
             * It only changes it's vertical position.
+            ☐ Fix player drops down before '\' char.
         ✔ Jumping. @done(20-12-01 19:33)
             * Remember the offset during the jump
             * During the fall, the ground must move to keep the player at the same height: that means that the player only moves up or down from IY to IY - MAX_JUMP_HEIGHT.
-
 
     TERRAIN:
         ☐ Visual design.
@@ -21,11 +21,14 @@ GENERAL DESIGN:
             * Should vary in height, creating the illusion that the player's climbing/descending a mountain (or something else).
         ✔ Terrain generator. @started(20-11-30 12:02) @done(20-11-30 14:27) @lasted(2h25m46s)
             ☐ Generate more than one tile at a time.
+            ☐ Redo terrain generator. @critical
+                Maybe read about noise generators?
         ✔ Terrain "mover". @done(20-11-30 10:44)
             ✔ First attempt: Chrono. @done(20-11-30 10:43)
                 * Basically, inside a loop, constantly check if n ammount of time has passed.
                 * I'm sticking with this implementation, for now.
         ✔ Terrain height offset. @done(20-11-30 16:17)
+        ☐ Variable speed.
 
     OBSTACLES:
         ☐ Visual design.
@@ -34,3 +37,8 @@ GENERAL DESIGN:
             * Should be related somehow to the previous one and the terrain.
             * There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
             * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
+        ☐ Spawn.
+
+    ☐ Score?
+    ☐ Extended ASCII table for more characters.
+        No idea...
