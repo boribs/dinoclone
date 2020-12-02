@@ -9,10 +9,12 @@ use chrono::*;
 use rand::seq::SliceRandom;
 
 
+const PLAYER_CHAR: u32 = '$' as u32;
+const MAX_JUMP_HEIGHT: i32 = 3;
 const IY: i32 = 5;
 const IX: i32 = 1;
 const PX: i32 = 23;
-const MIN_T_DIST: u32 = 45;
+const MIN_T_DIST: u32 = 10;
 
 
 #[derive(Copy, Clone)]
@@ -33,7 +35,6 @@ struct TerrainUnit {
     unit_type: TerrainType,
     initial_y: i32,
 }
-
 
 impl TerrainTile {
     fn new(c: char) -> TerrainTile {
@@ -76,6 +77,57 @@ impl TerrainUnit {
             unit_type: TerrainType::Down,
             initial_y: iy,
         }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Debug)]
+enum PlayerState {
+    Idle,
+    Running,
+    Jumping,
+    MaxHeight,
+    Falling,
+    Dead,
+}
+
+struct Player {
+    y_pos: i32,
+    state: PlayerState,
+}
+
+impl Player {
+    fn jump(&mut self) {
+        if self.state == PlayerState::Running {
+            self.state = PlayerState::Jumping;
+        }
+    }
+
+    fn update_pos(&mut self, air_dist: &mut i32) {
+        match self.state {
+            PlayerState::Jumping => {
+                self.y_pos -= 1;
+
+                if IY - self.y_pos == MAX_JUMP_HEIGHT {
+                    self.state = PlayerState::MaxHeight;
+                }
+            },
+            PlayerState::MaxHeight => {
+                *air_dist += 1;
+
+                if *air_dist == 7 {
+                    self.state = PlayerState::Falling;
+                }
+            },
+            PlayerState::Falling => {
+                self.y_pos += 1;
+
+                if self.y_pos == IY {
+                    self.state = PlayerState::Running;
+                    *air_dist = 0;
+                }
+            },
+            _ => {},
+        };
     }
 }
 
@@ -150,15 +202,22 @@ fn main() {
         }
     );
     terrain.append(&mut vec!(TerrainUnit::new_flat(IY); COLS() as usize / 6));
+    let mut player: Player = Player {
+        y_pos: IY,
+        state: PlayerState::Running,
+    };
 
+    let mut air_dist: i32 = 0;
     let mut last_time = offset::Local::now();
     let mut dist_since_last_incl: u32 = 0;
     let mut offset_y: i32 = 0;
 
-    loop {
+    while player.state != PlayerState::Dead {
         let c = getch();
         if c == 'q' as i32 {
-            break
+            break;
+        } else if c == 'w' as i32 {
+            player.jump();
         }
 
         let t = offset::Local::now();
@@ -176,6 +235,8 @@ fn main() {
                 TerrainType::Down => -1,
             };
 
+            player.update_pos(&mut air_dist);
+
             clear();
             mv(IY, IX);
             for j in 0..COLS() - 1 {
@@ -188,7 +249,7 @@ fn main() {
                 }
             }
 
-            mvaddch(IY, PX, '$' as u32);
+            mvaddch(player.y_pos, PX, PLAYER_CHAR);
             refresh();
         }
     }

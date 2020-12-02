@@ -1,12 +1,19 @@
 GENERAL DESIGN:
     PLAYER:
         ☐ Visual design.
+            ✔ Decide on the height. @done(20-12-01 18:06)
+                * One or two chars? One.
         ✔ Movement design. @done(20-11-27 20:08)
             * It's update rate should be the same as the screen's, unlike the terrain which moves "forward" every terrain_update_time milliseconds.
             * It only changes it's vertical position.
+        ☐ Jumping.
+            * Remember the offset during the jump
+            * During the fall, the ground must move to keep the player at the same height: that means that the player only moves up or down from IY to IY - MAX_JUMP_HEIGHT.
+
 
     TERRAIN:
         ☐ Visual design.
+            ☐ Colors?
             *Column based (one column is a unit). Each unit should be related to the previous one.
         ✔ Functional design. @done(20-11-27 20:08)
             * Should be smaller in lenght to the actual window and up to MAX_ROWS rows tall.
