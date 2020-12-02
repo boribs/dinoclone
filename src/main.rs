@@ -116,7 +116,7 @@ impl Player {
         }
     }
 
-    fn update_pos(&mut self) {
+    fn update_pos(&mut self, roffset_y: i32) {
         match self.state {
             PlayerState::Jumping => {
                 self.y_pos -= 1;
@@ -124,20 +124,32 @@ impl Player {
                 if IY - self.y_pos == MAX_JUMP_HEIGHT {
                     self.state = PlayerState::MaxHeight;
                 }
+
+                if self.y_pos >= IY - roffset_y {
+                    self.state = PlayerState::Running;
+                    self.y_pos = IY;
+                }
             }
             PlayerState::MaxHeight => {
-                self.air_dist += 1;
+                if self.y_pos >= IY - roffset_y {
+                    self.state = PlayerState::Running;
+                    self.air_dist = 0;
+                    self.y_pos = IY;
+                } else {
+                    self.air_dist += 1;
 
-                if self.air_dist == 7 {
-                    self.state = PlayerState::Falling;
+                    if self.air_dist == 7 {
+                        self.state = PlayerState::Falling;
+                    }
                 }
             }
             PlayerState::Falling => {
-                self.y_pos += 1;
-
-                if self.y_pos == IY {
+                if self.y_pos >= IY - roffset_y {
                     self.state = PlayerState::Running;
                     self.air_dist = 0;
+                    self.y_pos = IY;
+                } else {
+                    self.y_pos += 1;
                 }
             }
             _ => {}
@@ -223,9 +235,12 @@ fn main() {
     };
 
     let mut last_time = offset::Local::now();
+    let mut screen_dist: u32 = 0;
+
     let mut offset_y: i32 = 0;
     let mut roffset_y: i32 = 0;
-    let mut screen_dist: u32 = 0;
+
+    let mut pause: bool = false;
 
     while player.state != PlayerState::Dead {
         let c = getch();
@@ -233,48 +248,59 @@ fn main() {
             break;
         } else if c == 'w' as i32 {
             player.jump();
+        } if c == 'p' as i32 {
+            pause = !pause;
         }
 
         let t = offset::Local::now();
         if t >= last_time + Duration::milliseconds(100) {
-            screen_dist = scroll_terrain(&mut terrain, screen_dist);
-            last_time = t;
+            if !pause {
+                screen_dist = scroll_terrain(&mut terrain, screen_dist);
+                last_time = t;
 
-            roffset_y += match terrain[PX as usize].unit_type {
-                TerrainType::Flat => 0,
-                TerrainType::Up => 1,
-                TerrainType::Down => -1,
-            };
+                roffset_y += match terrain[PX as usize].unit_type {
+                    TerrainType::Flat => 0,
+                    TerrainType::Up => 1,
+                    TerrainType::Down => -1,
+                };
 
-            player.update_pos();
+                player.update_pos(roffset_y);
 
-            if player.state == PlayerState::Running {
-                offset_y += roffset_y;
-                roffset_y = 0;
-            }
-
-            clear();
-            mv(IY, IX);
-            for j in 0..COLS() - 1 {
-                for i in 0..3 {
-                    mvaddch(
-                        terrain[j as usize].initial_y + i + offset_y,
-                        IX + j,
-                        terrain[j as usize].tiles[i as usize].tile_char,
-                    );
+                if player.state == PlayerState::Running {
+                    offset_y += roffset_y;
+                    roffset_y = 0;
                 }
 
-                if terrain[j as usize].obstacle {
-                    mvaddch(
-                        terrain[j as usize].initial_y + offset_y,
-                        IX + j,
-                        OBSTACLE_CHAR,
-                    );
-                }
-            }
+                clear();
 
-            mvaddch(player.y_pos, PX, PLAYER_CHAR);
-            refresh();
+                mvprintw(0, 0, &format!("y pos:{}", player.y_pos));
+                mvprintw(1, 0, &format!("y off:{}", offset_y));
+                mvprintw(2, 0, &format!("y rof:{}", roffset_y));
+                mvprintw(3, 0, &format!("state:{:?}", player.state));
+                mvprintw(4, 0, &format!("tx:{}", terrain[PX as usize].initial_y));
+
+                mv(IY, IX);
+                for j in 0..COLS() - 1 {
+                    for i in 0..3 {
+                        mvaddch(
+                            terrain[j as usize].initial_y + i + offset_y,
+                            IX + j,
+                            terrain[j as usize].tiles[i as usize].tile_char,
+                        );
+                    }
+
+                    if terrain[j as usize].obstacle {
+                        mvaddch(
+                            terrain[j as usize].initial_y + offset_y,
+                            IX + j,
+                            OBSTACLE_CHAR,
+                        );
+                    }
+                }
+
+                mvaddch(player.y_pos, PX, PLAYER_CHAR);
+                refresh();
+            }
         }
     }
 

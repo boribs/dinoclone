@@ -10,7 +10,9 @@ GENERAL DESIGN:
         ✔ Jumping. @done(20-12-01 19:33)
             * Remember the offset during the jump
             * During the fall, the ground must move to keep the player at the same height: that means that the player only moves up or down from IY to IY - MAX_JUMP_HEIGHT.
-            ☐ Fix falling: don't tp the ground to the player once it reaches the ground.
+            ✔ Fix falling: don't tp the ground to the player once it reaches the ground. @done(20-12-02 16:58)
+            * Also fixed clipping issues when Jumping and during MaxHeight.
+            ☐ Smoother scrolling up/down when offsetting the player.
         ☐ Obstacle collision.
 
     TERRAIN:
