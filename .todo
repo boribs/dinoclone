@@ -10,6 +10,7 @@ GENERAL DESIGN:
         ✔ Jumping. @done(20-12-01 19:33)
             * Remember the offset during the jump
             * During the fall, the ground must move to keep the player at the same height: that means that the player only moves up or down from IY to IY - MAX_JUMP_HEIGHT.
+            ☐ Fix falling: don't tp the ground to the player once it reaches the ground.
         ☐ Obstacle collision.
 
     TERRAIN:
@@ -21,9 +22,10 @@ GENERAL DESIGN:
             * It's moving speed should increase from START_SPEED to MAX_SPEED as the player progresses.
             * Should vary in height, creating the illusion that the player's climbing/descending a mountain (or something else).
         ✔ Terrain generator. @started(20-11-30 12:02) @done(20-11-30 14:27) @lasted(2h25m46s)
-            ☐ Generate more than one tile at a time.
-            ☐ Redo terrain generator. @critical
+            ✔ Generate more than one tile at a time. @done(20-12-02 14:48)
+            ✔ Redo terrain generator. @critical @done(20-12-02 14:48)
                 Maybe read about noise generators?
+            ☐ Generate obstacles too!
         ✔ Terrain "mover". @done(20-11-30 10:44)
             ✔ First attempt: Chrono. @done(20-11-30 10:43)
                 * Basically, inside a loop, constantly check if n ammount of time has passed.
@@ -38,8 +40,9 @@ GENERAL DESIGN:
             * Should be related somehow to the previous one and the terrain.
             * There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
             * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
-        ✔ Spawn. @done(20-12-02 00:43)
 
     ☐ Score?
     ☐ Extended ASCII table for more characters.
         No idea...
+    ☐ Pause.
+    ☐ Press to start.
