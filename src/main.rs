@@ -105,6 +105,7 @@ enum PlayerState {
 
 struct Player {
     y_pos: i32,
+    air_dist: i32,
     state: PlayerState,
 }
 
@@ -115,7 +116,7 @@ impl Player {
         }
     }
 
-    fn update_pos(&mut self, air_dist: &mut i32) {
+    fn update_pos(&mut self) {
         match self.state {
             PlayerState::Jumping => {
                 self.y_pos -= 1;
@@ -125,9 +126,9 @@ impl Player {
                 }
             }
             PlayerState::MaxHeight => {
-                *air_dist += 1;
+                self.air_dist += 1;
 
-                if *air_dist == 7 {
+                if self.air_dist == 7 {
                     self.state = PlayerState::Falling;
                 }
             }
@@ -136,7 +137,7 @@ impl Player {
 
                 if self.y_pos == IY {
                     self.state = PlayerState::Running;
-                    *air_dist = 0;
+                    self.air_dist = 0;
                 }
             }
             _ => {}
@@ -217,10 +218,10 @@ fn main() {
     ]);
     let mut player: Player = Player {
         y_pos: IY,
+        air_dist: 0,
         state: PlayerState::Running,
     };
 
-    let mut air_dist: i32 = 0;
     let mut last_time = offset::Local::now();
     let mut offset_y: i32 = 0;
     let mut roffset_y: i32 = 0;
@@ -245,7 +246,7 @@ fn main() {
                 TerrainType::Down => -1,
             };
 
-            player.update_pos(&mut air_dist);
+            player.update_pos();
 
             if player.state == PlayerState::Running {
                 offset_y += roffset_y;
