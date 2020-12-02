@@ -211,6 +211,7 @@ fn main() {
     let mut last_time = offset::Local::now();
     let mut dist_since_last_incl: u32 = 0;
     let mut offset_y: i32 = 0;
+    let mut roffset_y: i32 = 0;
 
     while player.state != PlayerState::Dead {
         let c = getch();
@@ -229,13 +230,18 @@ fn main() {
                                    );
             last_time = t;
 
-            offset_y += match terrain[PX as usize].unit_type {
+            roffset_y += match terrain[PX as usize].unit_type {
                 TerrainType::Flat =>  0,
                 TerrainType::Up   =>  1,
                 TerrainType::Down => -1,
             };
 
             player.update_pos(&mut air_dist);
+
+            if player.state == PlayerState::Running {
+                offset_y += roffset_y;
+                roffset_y = 0;
+            }
 
             clear();
             mv(IY, IX);

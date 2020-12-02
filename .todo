@@ -6,7 +6,7 @@ GENERAL DESIGN:
         ✔ Movement design. @done(20-11-27 20:08)
             * It's update rate should be the same as the screen's, unlike the terrain which moves "forward" every terrain_update_time milliseconds.
             * It only changes it's vertical position.
-        ☐ Jumping.
+        ✔ Jumping. @done(20-12-01 19:33)
             * Remember the offset during the jump
             * During the fall, the ground must move to keep the player at the same height: that means that the player only moves up or down from IY to IY - MAX_JUMP_HEIGHT.
 
