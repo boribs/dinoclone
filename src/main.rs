@@ -248,7 +248,7 @@ fn main() {
             break;
         } else if c == 'w' as i32 {
             player.jump();
-        } if c == 'p' as i32 {
+        } else if c == 'p' as i32 {
             pause = !pause;
         }
 
@@ -300,6 +300,8 @@ fn main() {
 
                 mvaddch(player.y_pos, PX, PLAYER_CHAR);
                 refresh();
+            } else {
+                mvprintw(0, (COLS() / 2) - 3, "PAUSE");
             }
         }
     }
