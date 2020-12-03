@@ -20,7 +20,7 @@ const PX: i32 = 23;
 
 // Change these to alter terrain generation.
 const MIN_FLAT: f64 = -0.46;
-const MAX_FLAT: f64 =  0.46;
+const MAX_FLAT: f64 = 0.46;
 const X_STEP: f64 = 0.15;
 const Y_STEP: f64 = 0.03;
 
@@ -127,14 +127,12 @@ impl Player {
 
                 if self.y_pos >= IY - roffset_y {
                     self.state = PlayerState::Running;
-                    self.y_pos = IY;
                 }
             }
             PlayerState::MaxHeight => {
                 if self.y_pos >= IY - roffset_y {
                     self.state = PlayerState::Running;
                     self.air_dist = 0;
-                    self.y_pos = IY;
                 } else {
                     self.air_dist += 1;
 
@@ -147,12 +145,11 @@ impl Player {
                 if self.y_pos >= IY - roffset_y {
                     self.state = PlayerState::Running;
                     self.air_dist = 0;
-                    self.y_pos = IY;
                 } else {
                     self.y_pos += 1;
                 }
             }
-            _ => {}
+            _ => self.y_pos = IY - roffset_y,
         };
     }
 }
@@ -192,11 +189,7 @@ fn scroll_terrain(t: &mut Vec<TerrainUnit>, screen_dist: u32) -> u32 {
 
     if screen_dist == COLS() as u32 / 3 {
         let last = *t.last().unwrap();
-        t.append(
-            &mut generate_next_terrain_screen(
-                &last,
-                COLS() as usize
-        ));
+        t.append(&mut generate_next_terrain_screen(&last, COLS() as usize));
 
         return 1;
     }
@@ -264,21 +257,15 @@ fn main() {
                     TerrainType::Down => -1,
                 };
 
-                player.update_pos(roffset_y);
-
-                if player.state == PlayerState::Running {
-                    offset_y += roffset_y;
-                    roffset_y = 0;
+                if player.state == PlayerState::Running && roffset_y != 0 {
+                    let d = if roffset_y > 0 { 1 } else { -1 };
+                    offset_y += d;
+                    roffset_y -= d;
                 }
 
+                player.update_pos(roffset_y);
+
                 clear();
-
-                mvprintw(0, 0, &format!("y pos:{}", player.y_pos));
-                mvprintw(1, 0, &format!("y off:{}", offset_y));
-                mvprintw(2, 0, &format!("y rof:{}", roffset_y));
-                mvprintw(3, 0, &format!("state:{:?}", player.state));
-                mvprintw(4, 0, &format!("tx:{}", terrain[PX as usize].initial_y));
-
                 mv(IY, IX);
                 for j in 0..COLS() - 1 {
                     for i in 0..3 {
