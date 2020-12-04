@@ -53,7 +53,7 @@ GENERAL DESIGN:
             * There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
             * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
 
-    ☐ Score?
+    ✔ Score? @done(20-12-04 15:16)
         ☐ Store it somewhere.
         ☐ Highscore: highlight terrain where the highscore is.
     ☐ Extended ASCII table for more characters.

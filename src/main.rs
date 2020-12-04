@@ -259,7 +259,7 @@ fn scroll_terrain(
     screen_dist + 1
 }
 
-fn draw(terrain: &Vec<TerrainUnit>, offset_y: i32, player: &Player) {
+fn draw(terrain: &Vec<TerrainUnit>, offset_y: i32, player: &Player, score: u32) {
     clear();
     mv(IY, IX);
     for j in 0..COLS() - 1 {
@@ -281,6 +281,7 @@ fn draw(terrain: &Vec<TerrainUnit>, offset_y: i32, player: &Player) {
     }
 
     mvaddch(player.y_pos, PX, PLAYER_CHAR);
+    mvprintw(LINES() - 1, 0, &format!("Score: {}", score));
     refresh();
 }
 
@@ -325,8 +326,9 @@ fn main() {
 
         let mut pause: bool = false;
         let mut playing: bool = true;
+        let mut score: u32 = 0;
 
-        draw(&terrain, offset_y, &player);
+        draw(&terrain, offset_y, &player, score);
         mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
 
         while player.state == PlayerState::Idle {
@@ -376,8 +378,8 @@ fn main() {
                     }
 
                     player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
-                    draw(&terrain, offset_y, &player);
-
+                    draw(&terrain, offset_y, &player, score);
+                    score += 1;
                 } else if pause {
                     mvprintw(0, (COLS() / 2) - 3, "PAUSE");
                 } else {
@@ -387,7 +389,11 @@ fn main() {
             }
         }
 
-        mvprintw(2 * LINES() / 3, COLS() / 2 - 23, "PRESS 'JUMP' TO START AGAIN, 'QUIT' TO QUIT");
+        mvprintw(
+            2 * LINES() / 3,
+            COLS() / 2 - 23,
+            "PRESS 'JUMP' TO START AGAIN, 'QUIT' TO QUIT",
+        );
         loop {
             let key = getch();
             if key == KEY_QUIT {
