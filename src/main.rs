@@ -255,6 +255,31 @@ fn scroll_terrain(
     screen_dist + 1
 }
 
+fn draw(terrain: &Vec<TerrainUnit>, offset_y: i32, player: &Player) {
+    clear();
+    mv(IY, IX);
+    for j in 0..COLS() - 1 {
+        for i in 0..3 {
+            mvaddch(
+                terrain[j as usize].initial_y + i + offset_y,
+                IX + j,
+                terrain[j as usize].tiles[i as usize].tile_char,
+            );
+        }
+
+        if terrain[j as usize].obstacle {
+            mvaddch(
+                terrain[j as usize].initial_y + offset_y,
+                IX + j,
+                OBSTACLE_CHAR,
+            );
+        }
+    }
+
+    mvaddch(player.y_pos, PX, PLAYER_CHAR);
+    refresh();
+}
+
 fn main() {
     initscr();
     raw();
@@ -282,7 +307,7 @@ fn main() {
     let mut player: Player = Player {
         y_pos: IY,
         air_dist: 0,
-        state: PlayerState::Running,
+        state: PlayerState::Idle,
     };
 
     let mut last_time = offset::Local::now();
@@ -296,13 +321,29 @@ fn main() {
     let mut pause: bool = false;
     let mut playing: bool = true;
 
+    draw(&terrain, offset_y, &player);
+    mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
+
+    while player.state == PlayerState::Idle {
+        let key = getch();
+
+        if key == 'q' as i32 {
+            nocbreak();
+            endwin();
+            return;
+        } else if key != -1 {
+            player.state = PlayerState::Running;
+        }
+    }
+
     while playing {
-        let c = getch();
-        if c == 'q' as i32 {
+        let key = getch();
+
+        if key == 'q' as i32 {
             playing = false;
-        } else if c == 'w' as i32 {
+        } else if key == 'w' as i32 {
             player.jump();
-        } else if c == 'p' as i32 && player.state != PlayerState::Dead {
+        } else if key == 'p' as i32 && player.state != PlayerState::Dead {
             pause = !pause;
         }
 
@@ -330,29 +371,8 @@ fn main() {
                 }
 
                 player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
+                draw(&terrain, offset_y, &player);
 
-                clear();
-                mv(IY, IX);
-                for j in 0..COLS() - 1 {
-                    for i in 0..3 {
-                        mvaddch(
-                            terrain[j as usize].initial_y + i + offset_y,
-                            IX + j,
-                            terrain[j as usize].tiles[i as usize].tile_char,
-                        );
-                    }
-
-                    if terrain[j as usize].obstacle {
-                        mvaddch(
-                            terrain[j as usize].initial_y + offset_y,
-                            IX + j,
-                            OBSTACLE_CHAR,
-                        );
-                    }
-                }
-
-                mvaddch(player.y_pos, PX, PLAYER_CHAR);
-                refresh();
             } else if pause {
                 mvprintw(0, (COLS() / 2) - 3, "PAUSE");
             } else {

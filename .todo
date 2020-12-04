@@ -47,6 +47,7 @@ GENERAL DESIGN:
     OBSTACLES:
         ☐ Visual design.
             ☐ Types.
+                Tall and short obstacles!
         ✔ Functional design. @done(20-11-27 20:11)
             * Should be related somehow to the previous one and the terrain.
             * There can only be MAX_OBSATCLES_PER_SCREEN obstacles at a time.
@@ -58,4 +59,5 @@ GENERAL DESIGN:
     ☐ Extended ASCII table for more characters.
         No idea...
     ✔ Pause. @done(20-12-02 22:34)
-    ☐ Starting menu.
+    ✔ Starting menu. @done(20-12-04 13:07)
+    ☐ Display controls.
