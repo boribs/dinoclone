@@ -1,3 +1,6 @@
+BUGS:
+    ☐ Super jump: jumping when climbing. @bug
+
 GENERAL DESIGN:
     PLAYER:
         ☐ Visual design.
@@ -13,7 +16,7 @@ GENERAL DESIGN:
             ✔ Fix falling: don't tp the ground to the player once it reaches the ground. @done(20-12-02 16:58)
             * Also fixed clipping issues when Jumping and during MaxHeight.
             ✔ Smoother scrolling up/down when offsetting the player. @high @done(20-12-03 12:03)
-        ☐ Obstacle collision. @critical
+        ✔ Obstacle collision. @critical @done(20-12-03 19:05)
 
     TERRAIN:
         ☐ Visual design.
@@ -27,7 +30,13 @@ GENERAL DESIGN:
             ✔ Generate more than one tile at a time. @done(20-12-02 14:48)
             ✔ Redo terrain generator. @critical @done(20-12-02 14:48)
                 Maybe read about noise generators?
-            ☐ Generate obstacles too! @critical
+            ✔ Generate obstacles too! @critical @started(20-12-03 17:39) @done(20-12-03 18:26) @lasted(47m56s)
+                Obstacle generation rules: (hopefully)
+                * Cannot spawn immediately after an incline.
+                * Can only spawn in flat units.
+                * They have to be n units appart.
+                * The lenght must not exceed 2/3 of the player's jumping distance.
+            ☐ Biomes!
         ✔ Terrain "mover". @done(20-11-30 10:44)
             ✔ First attempt: Chrono. @done(20-11-30 10:43)
                 * Basically, inside a loop, constantly check if n ammount of time has passed.
@@ -45,6 +54,7 @@ GENERAL DESIGN:
 
     ☐ Score?
         ☐ Store it somewhere.
+        ☐ Highscore: highlight terrain where the highscore is.
     ☐ Extended ASCII table for more characters.
         No idea...
     ✔ Pause. @done(20-12-02 22:34)

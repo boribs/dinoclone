@@ -24,6 +24,10 @@ const MAX_FLAT: f64 = 0.46;
 const X_STEP: f64 = 0.15;
 const Y_STEP: f64 = 0.03;
 
+const MAX_OBST_LENGHT: u32 = 5;
+const MIN_OBST_DIST: u32 = 40;
+const MIN_INCL_DIST: u32 = 2;
+
 #[derive(Copy, Clone)]
 struct TerrainTile {
     tile_char: u32,
@@ -116,7 +120,7 @@ impl Player {
         }
     }
 
-    fn update_pos(&mut self, roffset_y: i32) {
+    fn update_pos(&mut self, current_unit: &TerrainUnit, offset_y: i32, roffset_y: i32) {
         match self.state {
             PlayerState::Jumping => {
                 self.y_pos -= 1;
@@ -151,26 +155,69 @@ impl Player {
             }
             _ => self.y_pos = IY - roffset_y,
         };
+
+        if self.y_pos == current_unit.initial_y + offset_y && current_unit.obstacle {
+            self.state = PlayerState::Dead;
+        }
     }
 }
 
-fn generate_next_terrain_screen(last: &TerrainUnit, screen_size: usize) -> Vec<TerrainUnit> {
+fn generate_next_terrain_screen(
+    last_unit: &TerrainUnit,
+    last_incline_dist: &mut u32,
+    last_obst_dist: &mut u32,
+    screen_size: usize,
+) -> Vec<TerrainUnit> {
     let mut t: Vec<TerrainUnit> = Vec::new();
     let perlin: Perlin = Perlin::new();
-    let n = rand::thread_rng().gen::<f64>();
 
-    let mut last_type: TerrainType = last.unit_type;
-    let mut last_y: i32 = last.initial_y;
+    let mut rng = rand::thread_rng();
+    let n: f64 = rng.gen::<f64>();
+
+    let mut last_type: TerrainType = last_unit.unit_type;
+    let mut last_y: i32 = last_unit.initial_y;
+    let mut last_obst: bool = last_unit.obstacle;
+
+    let mut next_obst_len: u32 = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+    let mut obst_len: u32 = 0;
 
     for i in 0..screen_size {
         let v: f64 = perlin.get([X_STEP * i as f64 + n, Y_STEP * i as f64 + n]);
 
-        if v <= MIN_FLAT && last_type != TerrainType::Up {
+        if v <= MIN_FLAT && last_type != TerrainType::Up && !last_obst {
             t.push(TerrainUnit::new_down(last_y + 1));
-        } else if v >= MAX_FLAT && last_type != TerrainType::Down {
+            *last_obst_dist += 1;
+            *last_incline_dist = 0;
+
+            if obst_len != 0 {
+                *last_obst_dist = 0;
+            }
+        } else if v >= MAX_FLAT && last_type != TerrainType::Down && !last_obst {
             t.push(TerrainUnit::new_up(last_y));
+            *last_obst_dist += 1;
+            *last_incline_dist = 0;
+
+            if obst_len != 0 {
+                *last_obst_dist = 0;
+            }
         } else {
-            t.push(TerrainUnit::new_flat(last_y, false));
+            let mut spawn_obst: bool = false;
+
+            if *last_obst_dist > MIN_OBST_DIST
+                && *last_incline_dist > MIN_INCL_DIST
+                && obst_len < next_obst_len
+            {
+                spawn_obst = true;
+                obst_len += 1;
+            } else if obst_len == next_obst_len {
+                obst_len = 0;
+                *last_obst_dist = 0;
+                next_obst_len = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+            }
+
+            *last_obst_dist += 1;
+            *last_incline_dist += 1;
+            t.push(TerrainUnit::new_flat(last_y, spawn_obst));
         }
 
         if last_type == TerrainType::Up {
@@ -179,17 +226,28 @@ fn generate_next_terrain_screen(last: &TerrainUnit, screen_size: usize) -> Vec<T
 
         last_type = t[i].unit_type;
         last_y = t[i].initial_y;
+        last_obst = t[i].obstacle;
     }
 
     t
 }
 
-fn scroll_terrain(t: &mut Vec<TerrainUnit>, screen_dist: u32) -> u32 {
+fn scroll_terrain(
+    t: &mut Vec<TerrainUnit>,
+    screen_dist: u32,
+    last_incline_dist: &mut u32,
+    last_obst_dist: &mut u32,
+) -> u32 {
     t.remove(0);
 
     if screen_dist == COLS() as u32 / 3 {
-        let last = *t.last().unwrap();
-        t.append(&mut generate_next_terrain_screen(&last, COLS() as usize));
+        let last_unit = *t.last().unwrap();
+        t.append(&mut generate_next_terrain_screen(
+            &last_unit,
+            last_incline_dist,
+            last_obst_dist,
+            COLS() as usize,
+        ));
 
         return 1;
     }
@@ -229,26 +287,34 @@ fn main() {
 
     let mut last_time = offset::Local::now();
     let mut screen_dist: u32 = 0;
+    let mut last_incline_dist: u32 = 0;
+    let mut last_obst_dist: u32 = 0;
 
     let mut offset_y: i32 = 0;
     let mut roffset_y: i32 = 0;
 
     let mut pause: bool = false;
+    let mut playing: bool = true;
 
-    while player.state != PlayerState::Dead {
+    while playing {
         let c = getch();
         if c == 'q' as i32 {
-            break;
+            playing = false;
         } else if c == 'w' as i32 {
             player.jump();
-        } else if c == 'p' as i32 {
+        } else if c == 'p' as i32 && player.state != PlayerState::Dead {
             pause = !pause;
         }
 
         let t = offset::Local::now();
         if t >= last_time + Duration::milliseconds(100) {
-            if !pause {
-                screen_dist = scroll_terrain(&mut terrain, screen_dist);
+            if !pause && player.state != PlayerState::Dead {
+                screen_dist = scroll_terrain(
+                    &mut terrain,
+                    screen_dist,
+                    &mut last_incline_dist,
+                    &mut last_obst_dist,
+                );
                 last_time = t;
 
                 roffset_y += match terrain[PX as usize].unit_type {
@@ -263,7 +329,7 @@ fn main() {
                     roffset_y -= d;
                 }
 
-                player.update_pos(roffset_y);
+                player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
 
                 clear();
                 mv(IY, IX);
@@ -287,8 +353,10 @@ fn main() {
 
                 mvaddch(player.y_pos, PX, PLAYER_CHAR);
                 refresh();
-            } else {
+            } else if pause {
                 mvprintw(0, (COLS() / 2) - 3, "PAUSE");
+            } else {
+                mvprintw(0, (COLS() / 2) - 3, "DEAD");
             }
         }
     }
