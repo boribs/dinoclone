@@ -118,8 +118,8 @@ struct Player {
 }
 
 impl Player {
-    fn jump(&mut self) {
-        if self.state == PlayerState::Running {
+    fn jump(&mut self, t: TerrainType) {
+        if self.state == PlayerState::Running && t != TerrainType::Up {
             self.state = PlayerState::Jumping;
         }
     }
@@ -348,8 +348,8 @@ fn main() {
 
             if key == KEY_QUIT {
                 playing = false;
-            } else if key == KEY_JUMP {
-                player.jump();
+            } else if key == KEY_JUMP && !pause{
+                player.jump(terrain[PX as usize].unit_type);
             } else if key == KEY_PAUSE && player.state != PlayerState::Dead {
                 pause = !pause;
             }
