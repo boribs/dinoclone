@@ -10,6 +10,10 @@ use ncurses::*;
 use noise::{NoiseFn, Perlin};
 use rand::Rng;
 
+const KEY_QUIT: i32 = 'q' as i32;
+const KEY_PAUSE: i32 = 'p' as i32;
+const KEY_JUMP: i32 = 'w' as i32;
+
 const PLAYER_CHAR: u32 = '$' as u32;
 const OBSTACLE_CHAR: u32 = '#' as u32;
 
@@ -289,98 +293,110 @@ fn main() {
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
 
-    let mut terrain: Vec<TerrainUnit> = vec![TerrainUnit::new_flat(IY, false); COLS() as usize];
-    terrain.push(TerrainUnit {
-        tiles: [
-            TerrainTile::new('_'),
-            TerrainTile::new('#'),
-            TerrainTile::new('#'),
-        ],
-        unit_type: TerrainType::Flat,
-        initial_y: IY,
-        obstacle: false,
-    });
-    terrain.append(&mut vec![
-        TerrainUnit::new_flat(IY, false);
-        COLS() as usize / 3
-    ]);
-    let mut player: Player = Player {
-        y_pos: IY,
-        air_dist: 0,
-        state: PlayerState::Idle,
-    };
+    loop {
+        let mut terrain: Vec<TerrainUnit> = vec![TerrainUnit::new_flat(IY, false); COLS() as usize];
+        terrain.push(TerrainUnit {
+            tiles: [
+                TerrainTile::new('_'),
+                TerrainTile::new('#'),
+                TerrainTile::new('#'),
+            ],
+            unit_type: TerrainType::Flat,
+            initial_y: IY,
+            obstacle: false,
+        });
+        terrain.append(&mut vec![
+            TerrainUnit::new_flat(IY, false);
+            COLS() as usize / 3
+        ]);
+        let mut player: Player = Player {
+            y_pos: IY,
+            air_dist: 0,
+            state: PlayerState::Idle,
+        };
 
-    let mut last_time = offset::Local::now();
-    let mut screen_dist: u32 = 0;
-    let mut last_incline_dist: u32 = 0;
-    let mut last_obst_dist: u32 = 0;
+        let mut last_time = offset::Local::now();
+        let mut screen_dist: u32 = 0;
+        let mut last_incline_dist: u32 = 0;
+        let mut last_obst_dist: u32 = 0;
 
-    let mut offset_y: i32 = 0;
-    let mut roffset_y: i32 = 0;
+        let mut offset_y: i32 = 0;
+        let mut roffset_y: i32 = 0;
 
-    let mut pause: bool = false;
-    let mut playing: bool = true;
+        let mut pause: bool = false;
+        let mut playing: bool = true;
 
-    draw(&terrain, offset_y, &player);
-    mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
+        draw(&terrain, offset_y, &player);
+        mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
 
-    while player.state == PlayerState::Idle {
-        let key = getch();
+        while player.state == PlayerState::Idle {
+            let key = getch();
 
-        if key == 'q' as i32 {
-            nocbreak();
-            endwin();
-            return;
-        } else if key != -1 {
-            player.state = PlayerState::Running;
-        }
-    }
-
-    while playing {
-        let key = getch();
-
-        if key == 'q' as i32 {
-            playing = false;
-        } else if key == 'w' as i32 {
-            player.jump();
-        } else if key == 'p' as i32 && player.state != PlayerState::Dead {
-            pause = !pause;
+            if key == KEY_QUIT {
+                nocbreak();
+                endwin();
+                return;
+            } else if key != -1 {
+                player.state = PlayerState::Running;
+            }
         }
 
-        let t = offset::Local::now();
-        if t >= last_time + Duration::milliseconds(100) {
-            if !pause && player.state != PlayerState::Dead {
-                screen_dist = scroll_terrain(
-                    &mut terrain,
-                    screen_dist,
-                    &mut last_incline_dist,
-                    &mut last_obst_dist,
-                );
-                last_time = t;
+        while playing {
+            let key = getch();
 
-                roffset_y += match terrain[PX as usize].unit_type {
-                    TerrainType::Flat => 0,
-                    TerrainType::Up => 1,
-                    TerrainType::Down => -1,
-                };
+            if key == KEY_QUIT {
+                playing = false;
+            } else if key == KEY_JUMP {
+                player.jump();
+            } else if key == KEY_PAUSE && player.state != PlayerState::Dead {
+                pause = !pause;
+            }
 
-                if player.state == PlayerState::Running && roffset_y != 0 {
-                    let d = if roffset_y > 0 { 1 } else { -1 };
-                    offset_y += d;
-                    roffset_y -= d;
+            let t = offset::Local::now();
+            if t >= last_time + Duration::milliseconds(100) {
+                if !pause && player.state != PlayerState::Dead {
+                    screen_dist = scroll_terrain(
+                        &mut terrain,
+                        screen_dist,
+                        &mut last_incline_dist,
+                        &mut last_obst_dist,
+                    );
+                    last_time = t;
+
+                    roffset_y += match terrain[PX as usize].unit_type {
+                        TerrainType::Flat => 0,
+                        TerrainType::Up => 1,
+                        TerrainType::Down => -1,
+                    };
+
+                    if player.state == PlayerState::Running && roffset_y != 0 {
+                        let d = if roffset_y > 0 { 1 } else { -1 };
+                        offset_y += d;
+                        roffset_y -= d;
+                    }
+
+                    player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
+                    draw(&terrain, offset_y, &player);
+
+                } else if pause {
+                    mvprintw(0, (COLS() / 2) - 3, "PAUSE");
+                } else {
+                    mvprintw(0, (COLS() / 2) - 3, "DEAD");
+                    break;
                 }
+            }
+        }
 
-                player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
-                draw(&terrain, offset_y, &player);
-
-            } else if pause {
-                mvprintw(0, (COLS() / 2) - 3, "PAUSE");
-            } else {
-                mvprintw(0, (COLS() / 2) - 3, "DEAD");
+        mvprintw(2 * LINES() / 3, COLS() / 2 - 23, "PRESS 'JUMP' TO START AGAIN, 'QUIT' TO QUIT");
+        loop {
+            let key = getch();
+            if key == KEY_QUIT {
+                nocbreak();
+                endwin();
+                return;
+            } else if key == KEY_JUMP {
+                break; // reset
             }
         }
     }
-
-    nocbreak();
-    endwin();
 }
