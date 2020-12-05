@@ -365,12 +365,6 @@ fn main() {
                     );
                     last_time = t;
 
-                    roffset_y += match terrain[PX as usize].unit_type {
-                        TerrainType::Flat => 0,
-                        TerrainType::Up => 1,
-                        TerrainType::Down => -1,
-                    };
-
                     if player.state == PlayerState::Running && roffset_y != 0 {
                         let d = if roffset_y > 0 { 1 } else { -1 };
                         offset_y += d;
@@ -380,6 +374,13 @@ fn main() {
                     player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
                     draw(&terrain, offset_y, &player, score);
                     score += 1;
+
+                    roffset_y += match terrain[PX as usize].unit_type {
+                        TerrainType::Flat => 0,
+                        TerrainType::Down => -1,
+                        TerrainType::Up => 1,
+                    };
+
                 } else if pause {
                     mvprintw(0, (COLS() / 2) - 3, "PAUSE");
                 } else {
