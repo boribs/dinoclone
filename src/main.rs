@@ -33,6 +33,8 @@ const MIN_OBST_DIST: u32 = 40;
 const MIN_INCL_DIST: u32 = 2;
 
 const MAX_SPEED: i64 = 50;
+const SPEED_CHANGE_INTERVAL: u32 = 300;
+const SPEED_MULT_CONST: f64 = 0.1;
 const INITIAL_SPEED: i64 = 100;
 const INITIAL_AIR_TIME: i32 = 7;
 
@@ -396,8 +398,8 @@ fn main() {
                         TerrainType::Up => 1,
                     };
 
-                    if score % 300 == 0 && speed > MAX_SPEED {
-                        speed_mult -= 0.1;
+                    if score % SPEED_CHANGE_INTERVAL == 0 && speed > MAX_SPEED {
+                        speed_mult -= SPEED_MULT_CONST;
                         speed = (speed as f64 * speed_mult) as i64; // mon-linear
                                                                     // speed = (INITIAL_SPEED as f64 * speed_mult) as i64; // linear
                         max_air_time =
