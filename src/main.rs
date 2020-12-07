@@ -32,7 +32,7 @@ const MAX_OBST_LENGHT: u32 = 5;
 const MIN_OBST_DIST: u32 = 40;
 const MIN_INCL_DIST: u32 = 2;
 
-const MAX_SPEED: i64 = 50;
+const MAX_SPEED: i64 = 40; // milliseconds update time
 const SPEED_CHANGE_INTERVAL: u32 = 300;
 const SPEED_MULT_CONST: f64 = 0.1;
 const INITIAL_SPEED: i64 = 100;
