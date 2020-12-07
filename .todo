@@ -1,5 +1,5 @@
 BUGS:
-    ☐ Super jump: jumping when climbing. @bug
+    ✔ Super jump: jumping when climbing. @bug @done(20-12-07 12:20)
         It has something to do with the way it get to maxheight and it does it when scrolling.
         Maybe limit it based on air time rather than position?
 
@@ -64,3 +64,4 @@ GENERAL DESIGN:
     ✔ Starting menu. @done(20-12-04 13:07)
     ✔ Respawn. @done(20-12-04 13:21)
     ☐ Display controls.
+    ☐ Organize in multiple files (just because).

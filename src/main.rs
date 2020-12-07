@@ -17,7 +17,7 @@ const KEY_JUMP: i32 = 'w' as i32;
 const PLAYER_CHAR: u32 = '$' as u32;
 const OBSTACLE_CHAR: u32 = '#' as u32;
 
-const MAX_JUMP_HEIGHT: i32 = 3;
+const JUMP_TO_MAX_HEIGHT_DIST: i32 = 3;
 const IY: i32 = 6;
 const IX: i32 = 1;
 const PX: i32 = 23;
@@ -128,8 +128,9 @@ impl Player {
         match self.state {
             PlayerState::Jumping => {
                 self.y_pos -= 1;
+                self.air_dist += 1;
 
-                if IY - self.y_pos == MAX_JUMP_HEIGHT {
+                if self.air_dist == JUMP_TO_MAX_HEIGHT_DIST {
                     self.state = PlayerState::MaxHeight;
                 }
 
@@ -282,6 +283,7 @@ fn draw(terrain: &Vec<TerrainUnit>, offset_y: i32, player: &Player, score: u32) 
 
     mvaddch(player.y_pos, PX, PLAYER_CHAR);
     mvprintw(LINES() - 1, 0, &format!("Score: {}", score));
+    mvprintw(0, 0, &format!("{}", player.air_dist));
     refresh();
 }
 
