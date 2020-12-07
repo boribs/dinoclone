@@ -121,11 +121,14 @@ struct Player {
     y_pos: i32,
     air_dist: i32,
     state: PlayerState,
+    remember_jump: bool,
 }
 
 impl Player {
     fn jump(&mut self, t: TerrainType) {
-        if self.state == PlayerState::Running && t != TerrainType::Up {
+        if t == TerrainType::Up {
+            self.remember_jump = true;
+        } else if self.state == PlayerState::Running {
             self.state = PlayerState::Jumping;
         }
     }
@@ -170,7 +173,14 @@ impl Player {
                     self.y_pos += 1;
                 }
             }
-            _ => self.y_pos = IY - roffset_y,
+            _ => {
+                if self.remember_jump && current_unit.unit_type != TerrainType::Up{
+                    self.state = PlayerState::Jumping;
+                    self.remember_jump = false;
+                } else {
+                    self.y_pos = IY - roffset_y
+                }
+            },
         };
 
         if self.y_pos == current_unit.initial_y + offset_y && current_unit.obstacle {
@@ -327,6 +337,7 @@ fn main() {
             y_pos: IY,
             air_dist: 0,
             state: PlayerState::Idle,
+            remember_jump: false,
         };
 
         let mut last_time = offset::Local::now();
