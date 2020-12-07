@@ -411,8 +411,8 @@ fn main() {
 
                     if score % SPEED_CHANGE_INTERVAL == 0 && speed > MAX_SPEED {
                         speed_mult -= SPEED_MULT_CONST;
-                        speed = (speed as f64 * speed_mult) as i64; // mon-linear
-                                                                    // speed = (INITIAL_SPEED as f64 * speed_mult) as i64; // linear
+                        speed = (INITIAL_SPEED as f64 * speed_mult) as i64; // linear
+                                                                            // speed = (speed as f64 * speed_mult) as i64; // mon-linear
                         max_air_time =
                             INITIAL_AIR_TIME + (max_air_time as f64 * (1.0 - speed_mult)) as i32;
                     }
