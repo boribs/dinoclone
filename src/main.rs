@@ -32,6 +32,10 @@ const MAX_OBST_LENGHT: u32 = 5;
 const MIN_OBST_DIST: u32 = 40;
 const MIN_INCL_DIST: u32 = 2;
 
+const MAX_SPEED: i64 = 50;
+const INITIAL_SPEED: i64 = 100;
+const INITIAL_AIR_TIME: i32 = 7;
+
 #[derive(Copy, Clone)]
 struct TerrainTile {
     tile_char: u32,
@@ -124,7 +128,13 @@ impl Player {
         }
     }
 
-    fn update_pos(&mut self, current_unit: &TerrainUnit, offset_y: i32, roffset_y: i32) {
+    fn update_pos(
+        &mut self,
+        current_unit: &TerrainUnit,
+        offset_y: i32,
+        roffset_y: i32,
+        max_air_time: i32,
+    ) {
         match self.state {
             PlayerState::Jumping => {
                 self.y_pos -= 1;
@@ -145,7 +155,7 @@ impl Player {
                 } else {
                     self.air_dist += 1;
 
-                    if self.air_dist == 7 {
+                    if self.air_dist == max_air_time {
                         self.state = PlayerState::Falling;
                     }
                 }
@@ -329,6 +339,10 @@ fn main() {
         let mut playing: bool = true;
         let mut score: u32 = 0;
 
+        let mut speed: i64 = INITIAL_SPEED;
+        let mut speed_mult: f64 = 1.0;
+        let mut max_air_time: i32 = INITIAL_AIR_TIME;
+
         draw(&terrain, offset_y, &player, score);
         mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
 
@@ -349,14 +363,14 @@ fn main() {
 
             if key == KEY_QUIT {
                 playing = false;
-            } else if key == KEY_JUMP && !pause{
+            } else if key == KEY_JUMP && !pause {
                 player.jump(terrain[PX as usize].unit_type);
             } else if key == KEY_PAUSE && player.state != PlayerState::Dead {
                 pause = !pause;
             }
 
             let t = offset::Local::now();
-            if t >= last_time + Duration::milliseconds(100) {
+            if t >= last_time + Duration::milliseconds(speed) {
                 if !pause && player.state != PlayerState::Dead {
                     screen_dist = scroll_terrain(
                         &mut terrain,
@@ -372,7 +386,7 @@ fn main() {
                         roffset_y -= d;
                     }
 
-                    player.update_pos(&terrain[PX as usize], offset_y, roffset_y);
+                    player.update_pos(&terrain[PX as usize], offset_y, roffset_y, max_air_time);
                     draw(&terrain, offset_y, &player, score);
                     score += 1;
 
@@ -382,6 +396,13 @@ fn main() {
                         TerrainType::Up => 1,
                     };
 
+                    if score % 300 == 0 && speed > MAX_SPEED {
+                        speed_mult -= 0.1;
+                        speed = (speed as f64 * speed_mult) as i64; // mon-linear
+                                                                    // speed = (INITIAL_SPEED as f64 * speed_mult) as i64; // linear
+                        max_air_time =
+                            INITIAL_AIR_TIME + (max_air_time as f64 * (1.0 - speed_mult)) as i32;
+                    }
                 } else if pause {
                     mvprintw(0, (COLS() / 2) - 3, "PAUSE");
                 } else {

@@ -18,6 +18,7 @@ GENERAL DESIGN:
             ✔ Fix falling: don't tp the ground to the player once it reaches the ground. @done(20-12-02 16:58)
             * Also fixed clipping issues when Jumping and during MaxHeight.
             ✔ Smoother scrolling up/down when offsetting the player. @high @done(20-12-03 12:03)
+            ☐ "Remember" the player wanted to jump (if climbing) and jump ASAP.
         ✔ Obstacle collision. @critical @done(20-12-03 19:05)
 
     TERRAIN:
@@ -44,7 +45,9 @@ GENERAL DESIGN:
                 * Basically, inside a loop, constantly check if n ammount of time has passed.
                 * I'm sticking with this implementation, for now.
         ✔ Terrain height offset. @done(20-11-30 16:17)
-        ☐ Variable speed.
+        ✔ Variable speed. @high @done(20-12-07 13:01)
+            ✔ Change jump distance based on speed. @done(20-12-07 13:01)
+            ☐ Decrease the speed when climbing?
 
     OBSTACLES:
         ☐ Visual design.
