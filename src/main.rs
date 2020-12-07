@@ -283,7 +283,6 @@ fn draw(terrain: &Vec<TerrainUnit>, offset_y: i32, player: &Player, score: u32) 
 
     mvaddch(player.y_pos, PX, PLAYER_CHAR);
     mvprintw(LINES() - 1, 0, &format!("Score: {}", score));
-    mvprintw(0, 0, &format!("{}", player.air_dist));
     refresh();
 }
 
