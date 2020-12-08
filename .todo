@@ -18,7 +18,7 @@ GENERAL DESIGN:
             ✔ Fix falling: don't tp the ground to the player once it reaches the ground. @done(20-12-02 16:58)
             * Also fixed clipping issues when Jumping and during MaxHeight.
             ✔ Smoother scrolling up/down when offsetting the player. @high @done(20-12-03 12:03)
-            ☐ "Remember" the player wanted to jump (if climbing) and jump ASAP.
+            ✔ "Remember" the player wanted to jump (if climbing) and jump ASAP. @done(20-12-07 14:23)
         ✔ Obstacle collision. @critical @done(20-12-03 19:05)
 
     TERRAIN:
@@ -67,4 +67,4 @@ GENERAL DESIGN:
     ✔ Starting menu. @done(20-12-04 13:07)
     ✔ Respawn. @done(20-12-04 13:21)
     ☐ Display controls.
-    ☐ Organize in multiple files (just because).
+    ✔ Organize in multiple files (just because). @done(20-12-07 18:21)
