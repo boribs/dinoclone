@@ -13,7 +13,7 @@ use terrain as t;
 
 const KEY_QUIT: i32 = 'q' as i32;
 const KEY_PAUSE: i32 = 'p' as i32;
-const KEY_JUMP: i32 = 'w' as i32;
+const KEY_JUMP: i32 = 'j' as i32;
 
 const IY: i32 = 6;
 const IX: i32 = 1;
