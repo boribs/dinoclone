@@ -1,6 +1,8 @@
-use ncurses::{mv, mvaddch, COLS};
+use ncurses::{attroff, attron, mv, mvaddch, COLS, COLOR_PAIR};
 use noise::{NoiseFn, Perlin};
 use rand::Rng;
+
+use super::colors as c;
 
 // Change these to alter terrain generation.
 const MIN_FLAT: f64 = -0.46;
@@ -17,6 +19,7 @@ const OBSTACLE_CHAR: u32 = '#' as u32;
 #[derive(Copy, Clone)]
 pub struct TerrainTile {
     pub tile_char: u32,
+    pub color_pair_id: i16,
 }
 
 #[derive(Copy, Clone, PartialEq)]
@@ -35,9 +38,10 @@ pub struct TerrainUnit {
 }
 
 impl TerrainTile {
-    pub fn new(c: char) -> TerrainTile {
+    pub fn new(c: char, color_id: i16) -> TerrainTile {
         TerrainTile {
             tile_char: c as u32,
+            color_pair_id: color_id,
         }
     }
 }
@@ -46,9 +50,9 @@ impl TerrainUnit {
     pub fn new_flat(iy: i32, obstacle: bool) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('_'),
-                TerrainTile::new('.'),
-                TerrainTile::new('.'),
+                TerrainTile::new('_', c::PAIR_GREEN),
+                TerrainTile::new('.', c::PAIR_WHITE),
+                TerrainTile::new('.', c::PAIR_WHITE),
             ],
             unit_type: TerrainType::Flat,
             initial_y: iy,
@@ -59,9 +63,9 @@ impl TerrainUnit {
     pub fn new_up(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('/'),
-                TerrainTile::new('.'),
-                TerrainTile::new('.'),
+                TerrainTile::new('/', c::PAIR_GREEN),
+                TerrainTile::new('.', c::PAIR_WHITE),
+                TerrainTile::new('.', c::PAIR_WHITE),
             ],
             unit_type: TerrainType::Up,
             initial_y: iy,
@@ -72,9 +76,9 @@ impl TerrainUnit {
     pub fn new_down(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('\\'),
-                TerrainTile::new('.'),
-                TerrainTile::new('.'),
+                TerrainTile::new('\\', c::PAIR_GREEN),
+                TerrainTile::new('.', c::PAIR_WHITE),
+                TerrainTile::new('.', c::PAIR_WHITE),
             ],
             unit_type: TerrainType::Down,
             initial_y: iy,
@@ -181,11 +185,13 @@ pub fn draw_terrain(t: &Vec<TerrainUnit>, offset_y: i32, iy: i32, ix: i32) {
     mv(iy, ix);
     for j in 0..COLS() - 1 {
         for i in 0..3 {
+            attron(COLOR_PAIR(t[j as usize].tiles[i as usize].color_pair_id));
             mvaddch(
                 t[j as usize].initial_y + i + offset_y,
                 ix + j,
                 t[j as usize].tiles[i as usize].tile_char,
             );
+            attroff(COLOR_PAIR(t[j as usize].tiles[i as usize].color_pair_id));
         }
 
         if t[j as usize].obstacle {

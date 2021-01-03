@@ -8,8 +8,11 @@ use ncurses::*;
 
 mod player;
 mod terrain;
+mod colors;
+
 use player as p;
 use terrain as t;
+use colors as c;
 
 const KEY_QUIT: i32 = 'q' as i32;
 const KEY_PAUSE: i32 = 'p' as i32;
@@ -42,15 +45,16 @@ fn main() {
     noecho();
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+    c::initialize_colors();
 
     loop {
         let mut terrain: Vec<t::TerrainUnit> =
             vec![t::TerrainUnit::new_flat(IY, false); COLS() as usize];
         terrain.push(t::TerrainUnit {
             tiles: [
-                t::TerrainTile::new('_'),
-                t::TerrainTile::new('#'),
-                t::TerrainTile::new('#'),
+                t::TerrainTile::new('_', c::PAIR_GREEN),
+                t::TerrainTile::new('#', c::PAIR_WHITE),
+                t::TerrainTile::new('#', c::PAIR_WHITE),
             ],
             unit_type: t::TerrainType::Flat,
             initial_y: IY,

@@ -44,6 +44,7 @@ GENERAL DESIGN:
             ✔ First attempt: Chrono. @done(20-11-30 10:43)
                 * Basically, inside a loop, constantly check if n ammount of time has passed.
                 * I'm sticking with this implementation, for now.
+            ☐ Second attempt: using threads.
         ✔ Terrain height offset. @done(20-11-30 16:17)
         ✔ Variable speed. @high @done(20-12-07 13:01)
             ✔ Change jump distance based on speed. @done(20-12-07 13:01)
@@ -67,4 +68,6 @@ GENERAL DESIGN:
     ✔ Starting menu. @done(20-12-04 13:07)
     ✔ Respawn. @done(20-12-04 13:21)
     ☐ Display controls.
+        ✔ Terrain colors. @done(21-01-02 20:24)
+        ☐ Player color.
     ✔ Organize in multiple files (just because). @done(20-12-07 18:21)
