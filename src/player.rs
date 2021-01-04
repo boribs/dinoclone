@@ -23,6 +23,15 @@ pub struct Player {
 }
 
 impl Player {
+    pub fn new() -> Self {
+        Player {
+            y_pos: IY,
+            air_dist: 0,
+            state: PlayerState::Idle,
+            remember_jump: false,
+        }
+    }
+
     pub fn jump(&mut self, t: &t::Terrain) {
         if t.vec[PX as usize].unit_type == t::TerrainType::Up {
             self.remember_jump = true;

@@ -20,12 +20,7 @@ fn main() {
 
     loop {
         let mut terrain: t::Terrain = t::Terrain::new();
-        let mut player: p::Player = p::Player {
-            y_pos: IY,
-            air_dist: 0,
-            state: p::PlayerState::Idle,
-            remember_jump: false,
-        };
+        let mut player: p::Player = p::Player::new();
 
         let mut last_time = offset::Local::now();
 
