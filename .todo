@@ -74,5 +74,6 @@ GENERAL DESIGN:
 
 REFACTOR:
     ✔ Make a lib.rs file and put there color-related stuff, constants and every other thing that's in main() that shouldn't be there (anything that's not main(), basically). @done(21-01-04 01:00) @critical
-    ☐ Make a terrain struct and put everything data-related there. @critical
+    ✔ Make a Terrain struct and put everything data-related there. @critical @done(21-01-04 11:37)
+    ☐ Make a Game struct to encapsulate all those variables.
     ☐ Terrain and Player initialization has to be dealt with by each separate struct (::new() for Player and Terrain) @critical

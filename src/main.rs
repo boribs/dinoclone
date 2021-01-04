@@ -70,8 +70,8 @@ fn main() {
             let t = offset::Local::now();
             if t >= last_time + Duration::milliseconds(speed) {
                 if !pause && player.state != p::PlayerState::Dead {
-                    terrain.scroll_terrain();
                     last_time = t;
+                    terrain.scroll_terrain();
 
                     if player.state == p::PlayerState::Running && roffset_y != 0 {
                         let d = if roffset_y > 0 { 1 } else { -1 };
