@@ -1,7 +1,6 @@
-use ncurses::{attroff, attron, mvaddch, COLOR_PAIR};
+use ncurses::mvaddch;
 
 use super::terrain as t;
-use super::colors as c;
 
 const PLAYER_CHAR: u32 = '$' as u32;
 const JUMP_TO_MAX_HEIGHT_DIST: i32 = 3;
@@ -90,7 +89,5 @@ impl Player {
 }
 
 pub fn draw_player(p: &Player, px: i32) {
-    attron(COLOR_PAIR(c::PAIR_RED));
     mvaddch(p.y_pos, px, PLAYER_CHAR);
-    attroff(COLOR_PAIR(c::PAIR_RED));
 }
