@@ -18,9 +18,8 @@ fn main() {
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
     initialize_colors();
 
-    let mut g = Game::new();
-
     loop {
+        let mut g = Game::new();
         let mut terrain: t::Terrain = t::Terrain::new();
         let mut player: p::Player = p::Player::new();
 
