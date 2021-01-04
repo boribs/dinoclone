@@ -17,9 +17,9 @@ const MIN_INCL_DIST: u32 = 2;
 const OBSTACLE_CHAR: u32 = '#' as u32;
 
 #[derive(Copy, Clone)]
-pub struct TerrainTile {
-    pub tile_char: u32,
-    pub color_pair_id: i16,
+struct TerrainTile {
+    tile_char: u32,
+    color_pair_id: i16,
 }
 
 #[derive(Copy, Clone, PartialEq)]
@@ -31,7 +31,7 @@ pub enum TerrainType {
 
 #[derive(Copy, Clone)]
 pub struct TerrainUnit {
-    pub tiles: [TerrainTile; 3],
+    tiles: [TerrainTile; 3],
     pub unit_type: TerrainType,
     pub initial_y: i32,
     pub obstacle: bool,
