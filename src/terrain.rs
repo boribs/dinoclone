@@ -139,17 +139,13 @@ impl Terrain {
         mv(IY, IX);
         for j in 0..COLS() - 1 {
             for i in 0..3 {
-                let y: i32 = self.vec[j as usize].initial_y + i + self.offset_y;
-
-                if y > -1 && y < LINES() {
-                    attron(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
-                    mvaddch(
-                        y,
-                        IX + j,
-                        self.vec[j as usize].tiles[i as usize].tile_char,
-                    );
-                    attroff(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
-                }
+                attron(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                mvaddch(
+                    self.vec[j as usize].initial_y + i + self.offset_y,
+                    IX + j,
+                    self.vec[j as usize].tiles[i as usize].tile_char,
+                );
+                attroff(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
             }
 
             if self.vec[j as usize].obstacle {
