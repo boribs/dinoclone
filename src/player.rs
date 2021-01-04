@@ -1,6 +1,6 @@
 use ncurses::mvaddch;
 
-use super::terrain as t;
+use crate::*;
 
 const PLAYER_CHAR: u32 = '$' as u32;
 const JUMP_TO_MAX_HEIGHT_DIST: i32 = 3;
@@ -23,8 +23,8 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn jump(&mut self, t: t::TerrainType) {
-        if t == t::TerrainType::Up {
+    pub fn jump(&mut self, t: &t::Terrain) {
+        if t.vec[PX as usize].unit_type == t::TerrainType::Up {
             self.remember_jump = true;
         } else if self.state == PlayerState::Running {
             self.state = PlayerState::Jumping;
@@ -33,12 +33,11 @@ impl Player {
 
     pub fn update_pos(
         &mut self,
-        iy: i32,
-        current_unit: &t::TerrainUnit,
-        offset_y: i32,
-        roffset_y: i32,
+        t: &t::Terrain,
         max_air_time: i32,
     ) {
+        let current_unit = t.vec[PX as usize];
+
         match self.state {
             PlayerState::Jumping => {
                 self.y_pos -= 1;
@@ -48,12 +47,12 @@ impl Player {
                     self.state = PlayerState::MaxHeight;
                 }
 
-                if self.y_pos >= iy - roffset_y {
+                if self.y_pos >= IY - t.roffset_y {
                     self.state = PlayerState::Running;
                 }
             }
             PlayerState::MaxHeight => {
-                if self.y_pos >= iy - roffset_y {
+                if self.y_pos >= IY - t.roffset_y {
                     self.state = PlayerState::Running;
                     self.air_dist = 0;
                 } else {
@@ -65,7 +64,7 @@ impl Player {
                 }
             }
             PlayerState::Falling => {
-                if self.y_pos >= iy - roffset_y {
+                if self.y_pos >= IY - t.roffset_y {
                     self.state = PlayerState::Running;
                     self.air_dist = 0;
                 } else {
@@ -77,12 +76,12 @@ impl Player {
                     self.state = PlayerState::Jumping;
                     self.remember_jump = false;
                 } else {
-                    self.y_pos = iy - roffset_y
+                    self.y_pos = IY - t.roffset_y
                 }
             }
         };
 
-        if self.y_pos == current_unit.initial_y + offset_y && current_unit.obstacle {
+        if self.y_pos == current_unit.initial_y + t.offset_y && current_unit.obstacle {
             self.state = PlayerState::Dead;
         }
     }

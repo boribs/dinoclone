@@ -33,15 +33,12 @@ fn main() {
         let mut speed_mult: f64 = 1.0;
         let mut max_air_time: i32 = INITIAL_AIR_TIME;
 
-        let mut offset_y: i32 = 0;
-        let mut roffset_y: i32 = 0;
-
         let mut pause: bool = false;
         let mut playing: bool = true;
 
         let mut score: u32 = 0;
 
-        draw(&terrain, offset_y, &player, score);
+        draw(&terrain, &player, score);
         mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
 
         while player.state == p::PlayerState::Idle {
@@ -62,7 +59,7 @@ fn main() {
             if key == KEY_QUIT {
                 playing = false;
             } else if key == KEY_JUMP && !pause {
-                player.jump(terrain.vec[PX as usize].unit_type);
+                player.jump(&terrain);
             } else if key == KEY_PAUSE && player.state != p::PlayerState::Dead {
                 pause = !pause;
             }
@@ -75,7 +72,7 @@ fn main() {
                     terrain.scroll_terrain();
                     terrain.offset(&player);
 
-                    player.update_pos(&terrain, terrain.offset_y, terrain.roffset_y, max_air_time);
+                    player.update_pos(&terrain, max_air_time);
                     draw(&terrain, &player, score);
                     score += 1;
 
