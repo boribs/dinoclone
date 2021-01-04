@@ -36,9 +36,9 @@ pub fn initialize_colors() {
     init_pair(PAIR_BLUE, COLOR_BLUE, COLOR_BLACK);
 }
 
-pub fn draw(terrain: &Vec<t::TerrainUnit>, offset_y: i32, player: &p::Player, score: u32) {
+pub fn draw(terrain: &t::Terrain, offset_y: i32, player: &p::Player, score: u32) {
     clear();
-    t::draw_terrain(terrain, offset_y, IY, IX);
+    terrain.draw_terrain(offset_y, IY, IX);
     p::draw_player(player, PX);
 
     mvprintw(LINES() - 1, 0, &format!("Score: {}", score));

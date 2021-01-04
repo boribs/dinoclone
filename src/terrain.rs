@@ -37,6 +37,11 @@ pub struct TerrainUnit {
     pub obstacle: bool,
 }
 
+pub struct Terrain {
+    pub vec: Vec<TerrainUnit>,
+    pub tile_count: u32,
+}
+
 impl TerrainTile {
     pub fn new(c: char, color_id: i16) -> TerrainTile {
         TerrainTile {
@@ -83,6 +88,55 @@ impl TerrainUnit {
             unit_type: TerrainType::Down,
             initial_y: iy,
             obstacle: false,
+        }
+    }
+}
+
+impl Terrain {
+    pub fn new() -> Self {
+        let mut terrain_vec: Vec<TerrainUnit> =
+            vec![TerrainUnit::new_flat(IY, false); COLS() as usize];
+
+        terrain_vec.push(t::TerrainUnit {
+            tiles: [
+                t::TerrainTile::new('_', PAIR_GREEN),
+                t::TerrainTile::new('#', PAIR_WHITE),
+                t::TerrainTile::new('#', PAIR_WHITE),
+            ],
+            unit_type: TerrainType::Flat,
+            initial_y: IY,
+            obstacle: false,
+        });
+
+        terrain_vec.append(&mut vec![
+            TerrainUnit::new_flat(IY, false);
+            COLS() as usize / 3
+        ]);
+
+        Terrain {
+            vec: terrain_vec,
+            tile_count: 0,
+        }
+    }
+
+    pub fn draw_terrain(&self, offset_y: i32, iy: i32, ix: i32) {
+        mv(iy, ix);
+        for j in 0..COLS() - 1 {
+            for i in 0..3 {
+                attron(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                mvaddch(
+                    self.vec[j as usize].initial_y + i + offset_y,
+                    ix + j,
+                    self.vec[j as usize].tiles[i as usize].tile_char,
+                );
+                attroff(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+            }
+
+            if self.vec[j as usize].obstacle {
+                attron(COLOR_PAIR(PAIR_RED));
+                mvaddch(self.vec[j as usize].initial_y + offset_y, ix + j, OBSTACLE_CHAR);
+                attroff(COLOR_PAIR(PAIR_RED));
+            }
         }
     }
 }

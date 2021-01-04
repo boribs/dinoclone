@@ -19,22 +19,7 @@ fn main() {
     dinoclone::initialize_colors();
 
     loop {
-        let mut terrain: Vec<t::TerrainUnit> =
-            vec![t::TerrainUnit::new_flat(IY, false); COLS() as usize];
-        terrain.push(t::TerrainUnit {
-            tiles: [
-                t::TerrainTile::new('_', PAIR_GREEN),
-                t::TerrainTile::new('#', PAIR_WHITE),
-                t::TerrainTile::new('#', PAIR_WHITE),
-            ],
-            unit_type: t::TerrainType::Flat,
-            initial_y: IY,
-            obstacle: false,
-        });
-        terrain.append(&mut vec![
-            t::TerrainUnit::new_flat(IY, false);
-            COLS() as usize / 3
-        ]);
+        let mut terrain: t::Terrain = t::Terrain::new();
         let mut player: p::Player = p::Player {
             y_pos: IY,
             air_dist: 0,
@@ -80,7 +65,7 @@ fn main() {
             if key == KEY_QUIT {
                 playing = false;
             } else if key == KEY_JUMP && !pause {
-                player.jump(terrain[PX as usize].unit_type);
+                player.jump(terrain.vec[PX as usize].unit_type);
             } else if key == KEY_PAUSE && player.state != p::PlayerState::Dead {
                 pause = !pause;
             }
@@ -89,7 +74,7 @@ fn main() {
             if t >= last_time + Duration::milliseconds(speed) {
                 if !pause && player.state != p::PlayerState::Dead {
                     screen_dist = t::scroll_terrain(
-                        &mut terrain,
+                        &mut terrain.vec,
                         screen_dist,
                         COLS() as u32 / 3,
                         &mut last_incline_dist,
@@ -103,11 +88,11 @@ fn main() {
                         roffset_y -= d;
                     }
 
-                    player.update_pos(IY, &terrain[PX as usize], offset_y, roffset_y, max_air_time);
+                    player.update_pos(IY, &terrain.vec[PX as usize], offset_y, roffset_y, max_air_time);
                     draw(&terrain, offset_y, &player, score);
                     score += 1;
 
-                    roffset_y += match terrain[PX as usize].unit_type {
+                    roffset_y += match terrain.vec[PX as usize].unit_type {
                         t::TerrainType::Flat => 0,
                         t::TerrainType::Down => -1,
                         t::TerrainType::Up => 1,
