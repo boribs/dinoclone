@@ -1,4 +1,4 @@
-use ncurses::{attroff, attron, mv, mvaddch, COLS, COLOR_PAIR};
+use ncurses::{attroff, attron, mv, mvaddch, COLOR_PAIR, COLS};
 use noise::{NoiseFn, Perlin};
 use rand::Rng;
 
@@ -46,7 +46,7 @@ pub struct Terrain {
     last_obst_dist: u32,
     screen_size: usize,
     screen_dist: u32,
-    screen_update_dist: u32
+    screen_update_dist: u32,
 }
 
 impl TerrainTile {
@@ -139,18 +139,26 @@ impl Terrain {
         mv(IY, IX);
         for j in 0..COLS() - 1 {
             for i in 0..3 {
-                attron(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                attron(COLOR_PAIR(
+                    self.vec[j as usize].tiles[i as usize].color_pair_id,
+                ));
                 mvaddch(
                     self.vec[j as usize].initial_y + i + self.offset_y,
                     IX + j,
                     self.vec[j as usize].tiles[i as usize].tile_char,
                 );
-                attroff(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                attroff(COLOR_PAIR(
+                    self.vec[j as usize].tiles[i as usize].color_pair_id,
+                ));
             }
 
             if self.vec[j as usize].obstacle {
                 attron(COLOR_PAIR(PAIR_RED));
-                mvaddch(self.vec[j as usize].initial_y + self.offset_y, IX + j, OBSTACLE_CHAR);
+                mvaddch(
+                    self.vec[j as usize].initial_y + self.offset_y,
+                    IX + j,
+                    OBSTACLE_CHAR,
+                );
                 attroff(COLOR_PAIR(PAIR_RED));
             }
         }

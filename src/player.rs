@@ -40,11 +40,7 @@ impl Player {
         }
     }
 
-    pub fn update_pos(
-        &mut self,
-        t: &t::Terrain,
-        g: &Game,
-    ) {
+    pub fn update_pos(&mut self, t: &t::Terrain, g: &Game) {
         let current_unit = t.vec[PX as usize];
 
         match self.state {
