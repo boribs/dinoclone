@@ -71,23 +71,15 @@ fn main() {
             if t >= last_time + Duration::milliseconds(speed) {
                 if !pause && player.state != p::PlayerState::Dead {
                     last_time = t;
+
                     terrain.scroll_terrain();
+                    terrain.offset(&player);
 
-                    if player.state == p::PlayerState::Running && roffset_y != 0 {
-                        let d = if roffset_y > 0 { 1 } else { -1 };
-                        offset_y += d;
-                        roffset_y -= d;
-                    }
-
-                    player.update_pos(IY, &terrain.vec[PX as usize], offset_y, roffset_y, max_air_time);
-                    draw(&terrain, offset_y, &player, score);
+                    player.update_pos(&terrain, terrain.offset_y, terrain.roffset_y, max_air_time);
+                    draw(&terrain, &player, score);
                     score += 1;
 
-                    roffset_y += match terrain.vec[PX as usize].unit_type {
-                        t::TerrainType::Flat => 0,
-                        t::TerrainType::Down => -1,
-                        t::TerrainType::Up => 1,
-                    };
+                    terrain.roffset();
 
                     if score % SPEED_CHANGE_INTERVAL == 0 && speed > MAX_SPEED {
                         speed_mult -= SPEED_MULT_CONST;

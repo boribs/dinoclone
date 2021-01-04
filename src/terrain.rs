@@ -39,6 +39,8 @@ pub struct TerrainUnit {
 
 pub struct Terrain {
     pub vec: Vec<TerrainUnit>,
+    pub offset_y: i32,
+    pub roffset_y: i32,
     tile_count: u32,
     last_incl_dist: u32,
     last_obst_dist: u32,
@@ -229,20 +231,21 @@ impl Terrain {
         self.screen_dist += 1;
     }
 
-}
-
-pub fn draw_terrain(t: &Vec<TerrainUnit>, offset_y: i32, iy: i32, ix: i32) {
-    mv(iy, ix);
-    for j in 0..COLS() - 1 {
-        for i in 0..3 {
-            attron(COLOR_PAIR(t[j as usize].tiles[i as usize].color_pair_id));
-            mvaddch(
-                t[j as usize].initial_y + i + offset_y,
-                ix + j,
-                t[j as usize].tiles[i as usize].tile_char,
-            );
-            attroff(COLOR_PAIR(t[j as usize].tiles[i as usize].color_pair_id));
+    pub fn offset(&mut self, p: &p::Player) {
+        if p.state == p::PlayerState::Running && self.roffset_y != 0 {
+            let d = if self.roffset_y > 0 { 1 } else { -1 };
+            self.offset_y += d;
+            self.roffset_y -= d;
         }
+    }
+
+    pub fn roffset(&mut self) {
+        self.roffset_y += match self.vec[PX as usize].unit_type {
+            TerrainType::Flat => 0,
+            TerrainType::Down => -1,
+            TerrainType::Up => 1,
+        };
+    }
 
         if t[j as usize].obstacle {
             attron(COLOR_PAIR(PAIR_RED));
