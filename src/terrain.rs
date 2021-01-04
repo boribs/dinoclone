@@ -130,25 +130,31 @@ impl Terrain {
             screen_size: screen_size,
             screen_dist: 0,
             screen_update_dist: screen_size as u32 / 3,
+            offset_y: 0,
+            roffset_y: 0,
         }
     }
 
-    pub fn draw_terrain(&self, offset_y: i32, iy: i32, ix: i32) {
-        mv(iy, ix);
+    pub fn draw_terrain(&self) {
+        mv(IY, IX);
         for j in 0..COLS() - 1 {
             for i in 0..3 {
-                attron(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
-                mvaddch(
-                    self.vec[j as usize].initial_y + i + offset_y,
-                    ix + j,
-                    self.vec[j as usize].tiles[i as usize].tile_char,
-                );
-                attroff(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                let y: i32 = self.vec[j as usize].initial_y + i + self.offset_y;
+
+                if y > -1 && y < LINES() {
+                    attron(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                    mvaddch(
+                        y,
+                        IX + j,
+                        self.vec[j as usize].tiles[i as usize].tile_char,
+                    );
+                    attroff(COLOR_PAIR(self.vec[j as usize].tiles[i as usize].color_pair_id));
+                }
             }
 
             if self.vec[j as usize].obstacle {
                 attron(COLOR_PAIR(PAIR_RED));
-                mvaddch(self.vec[j as usize].initial_y + offset_y, ix + j, OBSTACLE_CHAR);
+                mvaddch(self.vec[j as usize].initial_y + self.offset_y, IX + j, OBSTACLE_CHAR);
                 attroff(COLOR_PAIR(PAIR_RED));
             }
         }
@@ -247,10 +253,6 @@ impl Terrain {
         };
     }
 
-        if t[j as usize].obstacle {
-            attron(COLOR_PAIR(PAIR_RED));
-            mvaddch(t[j as usize].initial_y + offset_y, ix + j, OBSTACLE_CHAR);
-            attroff(COLOR_PAIR(PAIR_RED));
-        }
+}
     }
 }
