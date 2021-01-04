@@ -28,9 +28,6 @@ fn main() {
         };
 
         let mut last_time = offset::Local::now();
-        let mut screen_dist: u32 = 0;
-        let mut last_incline_dist: u32 = 0;
-        let mut last_obst_dist: u32 = 0;
 
         let mut speed: i64 = INITIAL_SPEED;
         let mut speed_mult: f64 = 1.0;
@@ -73,13 +70,7 @@ fn main() {
             let t = offset::Local::now();
             if t >= last_time + Duration::milliseconds(speed) {
                 if !pause && player.state != p::PlayerState::Dead {
-                    screen_dist = t::scroll_terrain(
-                        &mut terrain.vec,
-                        screen_dist,
-                        COLS() as u32 / 3,
-                        &mut last_incline_dist,
-                        &mut last_obst_dist,
-                    );
+                    terrain.scroll_terrain();
                     last_time = t;
 
                     if player.state == p::PlayerState::Running && roffset_y != 0 {

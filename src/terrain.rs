@@ -39,7 +39,12 @@ pub struct TerrainUnit {
 
 pub struct Terrain {
     pub vec: Vec<TerrainUnit>,
-    pub tile_count: u32,
+    tile_count: u32,
+    last_incl_dist: u32,
+    last_obst_dist: u32,
+    screen_size: usize,
+    screen_dist: u32,
+    screen_update_dist: u32
 }
 
 impl TerrainTile {
@@ -113,9 +118,16 @@ impl Terrain {
             COLS() as usize / 3
         ]);
 
+        let screen_size = COLS() as usize;
+
         Terrain {
             vec: terrain_vec,
             tile_count: 0,
+            last_incl_dist: 0,
+            last_obst_dist: 0,
+            screen_size: screen_size,
+            screen_dist: 0,
+            screen_update_dist: screen_size as u32 / 3,
         }
     }
 
@@ -139,100 +151,84 @@ impl Terrain {
             }
         }
     }
-}
 
-pub fn generate_next_terrain_screen(
-    last_unit: &TerrainUnit,
-    last_incline_dist: &mut u32,
-    last_obst_dist: &mut u32,
-    screen_size: usize,
-) -> Vec<TerrainUnit> {
-    let mut t: Vec<TerrainUnit> = Vec::new();
-    let perlin: Perlin = Perlin::new();
+    pub fn generate_next_terrain_screen(&mut self) {
+        let mut t: Vec<TerrainUnit> = Vec::new();
+        let perlin: Perlin = Perlin::new();
 
-    let mut rng = rand::thread_rng();
-    let n: f64 = rng.gen::<f64>();
+        let mut rng = rand::thread_rng();
+        let n: f64 = rng.gen::<f64>();
 
-    let mut last_type: TerrainType = last_unit.unit_type;
-    let mut last_y: i32 = last_unit.initial_y;
-    let mut last_obst: bool = last_unit.obstacle;
+        let last_unit: &TerrainUnit = self.vec.last().unwrap();
+        let mut last_type: TerrainType = last_unit.unit_type;
+        let mut last_y: i32 = last_unit.initial_y;
+        let mut last_obst: bool = last_unit.obstacle;
 
-    let mut next_obst_len: u32 = rng.gen_range(2, MAX_OBST_LENGHT + 1);
-    let mut obst_len: u32 = 0;
+        let mut next_obst_len: u32 = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+        let mut obst_len: u32 = 0;
 
-    for i in 0..screen_size {
-        let v: f64 = perlin.get([X_STEP * i as f64 + n, Y_STEP * i as f64 + n]);
+        for i in 0..self.screen_size {
+            let v: f64 = perlin.get([X_STEP * i as f64 + n, Y_STEP * i as f64 + n]);
 
-        if v <= MIN_FLAT && last_type != TerrainType::Up && !last_obst {
-            t.push(TerrainUnit::new_down(last_y + 1));
-            *last_obst_dist += 1;
-            *last_incline_dist = 0;
+            if v <= MIN_FLAT && last_type != TerrainType::Up && !last_obst {
+                t.push(TerrainUnit::new_down(last_y + 1));
+                self.last_obst_dist += 1;
+                self.last_incl_dist = 0;
 
-            if obst_len != 0 {
-                *last_obst_dist = 0;
+                if obst_len != 0 {
+                    self.last_obst_dist = 0;
+                }
+            } else if v >= MAX_FLAT && last_type != TerrainType::Down && !last_obst {
+                t.push(TerrainUnit::new_up(last_y));
+                self.last_obst_dist += 1;
+                self.last_incl_dist = 0;
+
+                if obst_len != 0 {
+                    self.last_obst_dist = 0;
+                }
+            } else {
+                let mut spawn_obst: bool = false;
+
+                if self.last_obst_dist > MIN_OBST_DIST
+                    && self.last_incl_dist > MIN_INCL_DIST
+                    && obst_len < next_obst_len
+                {
+                    spawn_obst = true;
+                    obst_len += 1;
+                } else if obst_len == next_obst_len {
+                    obst_len = 0;
+                    self.last_obst_dist = 0;
+                    next_obst_len = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+                }
+
+                self.last_obst_dist += 1;
+                self.last_incl_dist += 1;
+                t.push(TerrainUnit::new_flat(last_y, spawn_obst));
             }
-        } else if v >= MAX_FLAT && last_type != TerrainType::Down && !last_obst {
-            t.push(TerrainUnit::new_up(last_y));
-            *last_obst_dist += 1;
-            *last_incline_dist = 0;
 
-            if obst_len != 0 {
-                *last_obst_dist = 0;
-            }
-        } else {
-            let mut spawn_obst: bool = false;
-
-            if *last_obst_dist > MIN_OBST_DIST
-                && *last_incline_dist > MIN_INCL_DIST
-                && obst_len < next_obst_len
-            {
-                spawn_obst = true;
-                obst_len += 1;
-            } else if obst_len == next_obst_len {
-                obst_len = 0;
-                *last_obst_dist = 0;
-                next_obst_len = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+            if last_type == TerrainType::Up {
+                t[i].initial_y -= 1;
             }
 
-            *last_obst_dist += 1;
-            *last_incline_dist += 1;
-            t.push(TerrainUnit::new_flat(last_y, spawn_obst));
+            last_type = t[i].unit_type;
+            last_y = t[i].initial_y;
+            last_obst = t[i].obstacle;
         }
 
-        if last_type == TerrainType::Up {
-            t[i].initial_y -= 1;
+        self.vec.append(&mut t);
+    }
+
+    pub fn scroll_terrain(&mut self) {
+        self.vec.remove(0);
+
+        if self.screen_dist == self.screen_update_dist {
+            self.generate_next_terrain_screen();
+            return;
         }
 
-        last_type = t[i].unit_type;
-        last_y = t[i].initial_y;
-        last_obst = t[i].obstacle;
+        self.screen_dist += 1;
     }
 
-    t
-}
-
-pub fn scroll_terrain(
-    t: &mut Vec<TerrainUnit>,
-    screen_dist: u32,
-    screen_update_dist: u32,
-    last_incline_dist: &mut u32,
-    last_obst_dist: &mut u32,
-) -> u32 {
-    t.remove(0);
-
-    if screen_dist == screen_update_dist {
-        let last_unit = *t.last().unwrap();
-        t.append(&mut generate_next_terrain_screen(
-            &last_unit,
-            last_incline_dist,
-            last_obst_dist,
-            COLS() as usize,
-        ));
-
-        return 1;
-    }
-
-    screen_dist + 1
 }
 
 pub fn draw_terrain(t: &Vec<TerrainUnit>, offset_y: i32, iy: i32, ix: i32) {
