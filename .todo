@@ -44,7 +44,7 @@ GENERAL DESIGN:
             ✔ First attempt: Chrono. @done(20-11-30 10:43)
                 * Basically, inside a loop, constantly check if n ammount of time has passed.
                 * I'm sticking with this implementation, for now.
-            ☐ Second attempt: using threads.
+            ☐ Second attempt: using threads. @high
         ✔ Terrain height offset. @done(20-11-30 16:17)
         ✔ Variable speed. @high @done(20-12-07 13:01)
             ✔ Change jump distance based on speed. @done(20-12-07 13:01)
@@ -60,7 +60,6 @@ GENERAL DESIGN:
             * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
 
     ✔ Score? @done(20-12-04 15:16)
-        ☐ Store it somewhere.
         ☐ Highscore: highlight terrain where the highscore is.
     ☐ Extended ASCII table for more characters.
         No idea...
@@ -72,3 +71,8 @@ GENERAL DESIGN:
         ✘ Player color. @cancelled(21-01-03 23:47)
             Decided that the player character should stay white.
     ✔ Organize in multiple files (just because). @done(20-12-07 18:21)
+
+REFACTOR:
+    ✔ Make a lib.rs file and put there color-related stuff, constants and every other thing that's in main() that shouldn't be there (anything that's not main(), basically). @done(21-01-04 01:00) @critical
+    ☐ Make a terrain struct and put everything data-related there. @critical
+    ☐ Terrain and Player initialization has to be dealt with by each separate struct (::new() for Player and Terrain) @critical

@@ -6,36 +6,7 @@ extern crate rand;
 use chrono::*;
 use ncurses::*;
 
-mod player;
-mod terrain;
-mod colors;
-
-use player as p;
-use terrain as t;
-use colors as c;
-
-const KEY_QUIT: i32 = 'q' as i32;
-const KEY_PAUSE: i32 = 'p' as i32;
-const KEY_JUMP: i32 = 'j' as i32;
-
-const IY: i32 = 6;
-const IX: i32 = 1;
-const PX: i32 = 23;
-
-const MAX_SPEED: i64 = 40; // milliseconds update time
-const SPEED_CHANGE_INTERVAL: u32 = 300;
-const SPEED_MULT_CONST: f64 = 0.1;
-const INITIAL_SPEED: i64 = 100;
-const INITIAL_AIR_TIME: i32 = 7;
-
-fn draw(terrain: &Vec<t::TerrainUnit>, offset_y: i32, player: &p::Player, score: u32) {
-    clear();
-    t::draw_terrain(terrain, offset_y, IY, IX);
-    p::draw_player(player, PX);
-
-    mvprintw(LINES() - 1, 0, &format!("Score: {}", score));
-    refresh();
-}
+use dinoclone::*;
 
 fn main() {
     initscr();
@@ -45,16 +16,16 @@ fn main() {
     noecho();
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
-    c::initialize_colors();
+    dinoclone::initialize_colors();
 
     loop {
         let mut terrain: Vec<t::TerrainUnit> =
             vec![t::TerrainUnit::new_flat(IY, false); COLS() as usize];
         terrain.push(t::TerrainUnit {
             tiles: [
-                t::TerrainTile::new('_', c::PAIR_GREEN),
-                t::TerrainTile::new('#', c::PAIR_WHITE),
-                t::TerrainTile::new('#', c::PAIR_WHITE),
+                t::TerrainTile::new('_', PAIR_GREEN),
+                t::TerrainTile::new('#', PAIR_WHITE),
+                t::TerrainTile::new('#', PAIR_WHITE),
             ],
             unit_type: t::TerrainType::Flat,
             initial_y: IY,
@@ -76,16 +47,17 @@ fn main() {
         let mut last_incline_dist: u32 = 0;
         let mut last_obst_dist: u32 = 0;
 
+        let mut speed: i64 = INITIAL_SPEED;
+        let mut speed_mult: f64 = 1.0;
+        let mut max_air_time: i32 = INITIAL_AIR_TIME;
+
         let mut offset_y: i32 = 0;
         let mut roffset_y: i32 = 0;
 
         let mut pause: bool = false;
         let mut playing: bool = true;
-        let mut score: u32 = 0;
 
-        let mut speed: i64 = INITIAL_SPEED;
-        let mut speed_mult: f64 = 1.0;
-        let mut max_air_time: i32 = INITIAL_AIR_TIME;
+        let mut score: u32 = 0;
 
         draw(&terrain, offset_y, &player, score);
         mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");

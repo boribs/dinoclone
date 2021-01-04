@@ -2,7 +2,7 @@ use ncurses::{attroff, attron, mv, mvaddch, COLS, COLOR_PAIR};
 use noise::{NoiseFn, Perlin};
 use rand::Rng;
 
-use super::colors as c;
+use crate::*;
 
 // Change these to alter terrain generation.
 const MIN_FLAT: f64 = -0.46;
@@ -50,9 +50,9 @@ impl TerrainUnit {
     pub fn new_flat(iy: i32, obstacle: bool) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('_', c::PAIR_GREEN),
-                TerrainTile::new('.', c::PAIR_WHITE),
-                TerrainTile::new('.', c::PAIR_WHITE),
+                TerrainTile::new('_', PAIR_GREEN),
+                TerrainTile::new('.', PAIR_WHITE),
+                TerrainTile::new('.', PAIR_WHITE),
             ],
             unit_type: TerrainType::Flat,
             initial_y: iy,
@@ -63,9 +63,9 @@ impl TerrainUnit {
     pub fn new_up(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('/', c::PAIR_GREEN),
-                TerrainTile::new('.', c::PAIR_WHITE),
-                TerrainTile::new('.', c::PAIR_WHITE),
+                TerrainTile::new('/', PAIR_GREEN),
+                TerrainTile::new('.', PAIR_WHITE),
+                TerrainTile::new('.', PAIR_WHITE),
             ],
             unit_type: TerrainType::Up,
             initial_y: iy,
@@ -76,9 +76,9 @@ impl TerrainUnit {
     pub fn new_down(iy: i32) -> TerrainUnit {
         TerrainUnit {
             tiles: [
-                TerrainTile::new('\\', c::PAIR_GREEN),
-                TerrainTile::new('.', c::PAIR_WHITE),
-                TerrainTile::new('.', c::PAIR_WHITE),
+                TerrainTile::new('\\', PAIR_GREEN),
+                TerrainTile::new('.', PAIR_WHITE),
+                TerrainTile::new('.', PAIR_WHITE),
             ],
             unit_type: TerrainType::Down,
             initial_y: iy,
@@ -195,7 +195,9 @@ pub fn draw_terrain(t: &Vec<TerrainUnit>, offset_y: i32, iy: i32, ix: i32) {
         }
 
         if t[j as usize].obstacle {
+            attron(COLOR_PAIR(PAIR_RED));
             mvaddch(t[j as usize].initial_y + offset_y, ix + j, OBSTACLE_CHAR);
+            attroff(COLOR_PAIR(PAIR_RED));
         }
     }
 }
