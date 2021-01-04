@@ -16,7 +16,9 @@ fn main() {
     noecho();
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
-    dinoclone::initialize_colors();
+    initialize_colors();
+
+    let mut g = Game::new();
 
     loop {
         let mut terrain: t::Terrain = t::Terrain::new();
@@ -24,63 +26,47 @@ fn main() {
 
         let mut last_time = offset::Local::now();
 
-        let mut speed: i64 = INITIAL_SPEED;
-        let mut speed_mult: f64 = 1.0;
-        let mut max_air_time: i32 = INITIAL_AIR_TIME;
-
-        let mut pause: bool = false;
-        let mut playing: bool = true;
-
-        let mut score: u32 = 0;
-
-        draw(&terrain, &player, score);
+        draw(&terrain, &player, &g);
         mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
 
         while player.state == p::PlayerState::Idle {
             let key = getch();
 
             if key == KEY_QUIT {
-                nocbreak();
-                endwin();
+                exit_config();
                 return;
             } else if key != -1 {
                 player.state = p::PlayerState::Running;
             }
         }
 
-        while playing {
+        while g.playing {
             let key = getch();
 
             if key == KEY_QUIT {
-                playing = false;
-            } else if key == KEY_JUMP && !pause {
+                g.playing = false;
+            } else if key == KEY_JUMP && !g.pause {
                 player.jump(&terrain);
             } else if key == KEY_PAUSE && player.state != p::PlayerState::Dead {
-                pause = !pause;
+                g.pause = !g.pause;
             }
 
             let t = offset::Local::now();
-            if t >= last_time + Duration::milliseconds(speed) {
-                if !pause && player.state != p::PlayerState::Dead {
+            if t >= last_time + Duration::milliseconds(g.speed) {
+                if !g.pause && player.state != p::PlayerState::Dead {
                     last_time = t;
 
                     terrain.scroll_terrain();
                     terrain.offset(&player);
 
-                    player.update_pos(&terrain, max_air_time);
-                    draw(&terrain, &player, score);
-                    score += 1;
+                    player.update_pos(&terrain, &g);
+                    draw(&terrain, &player, &g);
 
                     terrain.roffset();
+                    g.update_speed();
+                    g.update_score();
 
-                    if score % SPEED_CHANGE_INTERVAL == 0 && speed > MAX_SPEED {
-                        speed_mult -= SPEED_MULT_CONST;
-                        speed = (INITIAL_SPEED as f64 * speed_mult) as i64; // linear
-                                                                            // speed = (speed as f64 * speed_mult) as i64; // mon-linear
-                        max_air_time =
-                            INITIAL_AIR_TIME + (max_air_time as f64 * (1.0 - speed_mult)) as i32;
-                    }
-                } else if pause {
+                } else if g.pause {
                     mvprintw(0, (COLS() / 2) - 3, "PAUSE");
                 } else {
                     mvprintw(0, (COLS() / 2) - 3, "DEAD");
@@ -98,8 +84,7 @@ fn main() {
         loop {
             let key = getch();
             if key == KEY_QUIT {
-                nocbreak();
-                endwin();
+                exit_config();
                 return;
             } else if key == KEY_JUMP {
                 break; // reset

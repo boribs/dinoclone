@@ -36,11 +36,52 @@ pub fn initialize_colors() {
     init_pair(PAIR_BLUE, COLOR_BLUE, COLOR_BLACK);
 }
 
-pub fn draw(terrain: &t::Terrain, player: &p::Player, score: u32) {
+pub fn draw(terrain: &t::Terrain, player: &p::Player, game_data: &Game) {
     clear();
     terrain.draw_terrain();
     player.draw_player();
 
-    mvprintw(LINES() - 1, 0, &format!("Score: {}", score));
+    mvprintw(LINES() - 1, 0, &format!("Score: {}", game_data.score));
     refresh();
+}
+
+pub fn exit_config() {
+    nocbreak();
+    endwin();
+}
+
+pub struct Game {
+    pub playing: bool,
+    pub pause: bool,
+    pub score: u32,
+    pub speed: i64,
+    pub max_air_time: i32,
+    speed_mult: f64,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        Game {
+            playing: true,
+            pause: false,
+            score: 0,
+            speed: INITIAL_SPEED,
+            speed_mult: 1.0,
+            max_air_time: INITIAL_AIR_TIME,
+        }
+    }
+
+    pub fn update_speed(&mut self) {
+        if self.score % SPEED_CHANGE_INTERVAL == 0 && self.speed > MAX_SPEED {
+            self.speed_mult -= SPEED_MULT_CONST;
+            self.speed = (INITIAL_SPEED as f64 * self.speed_mult) as i64; // linear
+                                                                // speed = (speed as f64 * speed_mult) as i64; // mon-linear
+            self.max_air_time =
+                INITIAL_AIR_TIME + (self.max_air_time as f64 * (1.0 - self.speed_mult)) as i32;
+        }
+    }
+
+    pub fn update_score(&mut self) {
+        self.score += 1;
+    }
 }

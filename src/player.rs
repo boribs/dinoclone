@@ -43,7 +43,7 @@ impl Player {
     pub fn update_pos(
         &mut self,
         t: &t::Terrain,
-        max_air_time: i32,
+        g: &Game,
     ) {
         let current_unit = t.vec[PX as usize];
 
@@ -67,7 +67,7 @@ impl Player {
                 } else {
                     self.air_dist += 1;
 
-                    if self.air_dist == max_air_time {
+                    if self.air_dist == g.max_air_time {
                         self.state = PlayerState::Falling;
                     }
                 }
