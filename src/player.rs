@@ -94,8 +94,8 @@ impl Player {
             self.state = PlayerState::Dead;
         }
     }
-}
 
-pub fn draw_player(p: &Player, px: i32) {
-    mvaddch(p.y_pos, px, PLAYER_CHAR);
+    pub fn draw_player(&self) {
+        mvaddch(self.y_pos, PX, PLAYER_CHAR);
+    }
 }

@@ -39,7 +39,7 @@ pub fn initialize_colors() {
 pub fn draw(terrain: &t::Terrain, player: &p::Player, score: u32) {
     clear();
     terrain.draw_terrain();
-    p::draw_player(player, PX);
+    player.draw_player();
 
     mvprintw(LINES() - 1, 0, &format!("Score: {}", score));
     refresh();
