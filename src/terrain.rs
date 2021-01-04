@@ -256,7 +256,4 @@ impl Terrain {
             TerrainType::Up => 1,
         };
     }
-
-}
-    }
 }
