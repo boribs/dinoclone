@@ -75,7 +75,7 @@ impl Game {
         if self.score % SPEED_CHANGE_INTERVAL == 0 && self.speed > MAX_SPEED {
             self.speed_mult -= SPEED_MULT_CONST;
             self.speed = (INITIAL_SPEED as f64 * self.speed_mult) as i64; // linear
-                                                                // speed = (speed as f64 * speed_mult) as i64; // mon-linear
+                                                                // speed = (speed as f64 * speed_mult) as i64; // non-linear
             self.max_air_time =
                 INITIAL_AIR_TIME + (self.max_air_time as f64 * (1.0 - self.speed_mult)) as i32;
         }

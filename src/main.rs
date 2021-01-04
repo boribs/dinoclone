@@ -26,8 +26,13 @@ fn main() {
 
         let mut last_time = offset::Local::now();
 
+        // Start menu loop
         draw(&terrain, &player, &g);
-        mvprintw(LINES() / 2, COLS() / 2 - 12, "PRESS ANY KEY TO PLAY");
+        mvprintw(
+            2 * LINES() / 3,
+            COLS() / 2 - 23,
+            "PRESS 'JUMP' TO START AGAIN, 'QUIT' TO QUIT",
+        );
 
         while player.state == p::PlayerState::Idle {
             let key = getch();
@@ -40,6 +45,7 @@ fn main() {
             }
         }
 
+        // Main loop
         while g.playing {
             let key = getch();
 
@@ -75,6 +81,7 @@ fn main() {
             }
         }
 
+        // Death / quit loop
         mvprintw(
             2 * LINES() / 3,
             COLS() / 2 - 23,
