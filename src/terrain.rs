@@ -24,9 +24,9 @@ struct TerrainTile {
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum TerrainType {
-    Flat,
-    Up,
-    Down,
+    Flat = 0,
+    Up = 1,
+    Down = -1,
 }
 
 #[derive(Copy, Clone)]
@@ -250,10 +250,6 @@ impl Terrain {
     }
 
     pub fn roffset(&mut self) {
-        self.roffset_y += match self.vec[PX as usize].unit_type {
-            TerrainType::Flat => 0,
-            TerrainType::Down => -1,
-            TerrainType::Up => 1,
-        };
+        self.roffset_y += self.vec[PX as usize].unit_type as i32;
     }
 }
