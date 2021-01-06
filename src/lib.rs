@@ -95,7 +95,7 @@ impl Game {
             mvprintw(
                 2 * LINES() / 3,
                 COLS() / 2 - 23,
-                "PRESS 'JUMP' TO START AGAIN, 'QUIT' TO QUIT",
+                "PRESS 'JUMP' TO START, 'QUIT' TO QUIT",
             );
 
             while player.state == p::PlayerState::Idle {
