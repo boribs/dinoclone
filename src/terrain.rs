@@ -177,7 +177,7 @@ impl Terrain {
         let mut next_obst_len: u32 = rng.gen_range(2, MAX_OBST_LENGHT + 1);
         let mut obst_len: u32 = 0;
 
-        for i in 0..self.screen_size {
+        for i in 0..self.screen_update_dist as usize + 1 {
             let v: f64 = perlin.get([X_STEP * i as f64 + n, Y_STEP * i as f64 + n]);
 
             if v <= MIN_FLAT && last_type != TerrainType::Up && !last_obst {
