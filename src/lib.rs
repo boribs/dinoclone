@@ -65,6 +65,7 @@ pub struct Game {
     pub max_air_time: i32,
     pub highscore: u32,
     speed_mult: f64,
+    tile_count: u32,
 }
 
 impl Game {
@@ -77,11 +78,12 @@ impl Game {
             max_air_time: INITIAL_AIR_TIME,
             highscore: highscore,
             speed_mult: 1.0,
+            tile_count: 0,
         }
     }
 
     pub fn update_speed(&mut self) {
-        if self.score % SPEED_CHANGE_INTERVAL == 0 && self.speed > MAX_SPEED {
+        if self.score != 0 && self.score % SPEED_CHANGE_INTERVAL == 0 && self.speed > MAX_SPEED {
             self.speed_mult -= SPEED_MULT_CONST;
             self.speed = (INITIAL_SPEED as f64 * self.speed_mult) as i64; // linear
                                                                           // speed = (speed as f64 * speed_mult) as i64; // non-linear
@@ -91,7 +93,11 @@ impl Game {
     }
 
     pub fn update_score(&mut self) {
-        self.score += 1;
+        if self.tile_count < (COLS() - PX) as u32 {
+            self.tile_count += 1;
+        } else {
+            self.score += 1;
+        }
     }
 
     pub fn run(highscore: u32) {
