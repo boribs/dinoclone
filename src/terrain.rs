@@ -41,7 +41,6 @@ pub struct Terrain {
     pub vec: Vec<TerrainUnit>,
     pub offset_y: i32,
     pub roffset_y: i32,
-    tile_count: u32,
     last_incl_dist: u32,
     last_obst_dist: u32,
     screen_size: usize,
@@ -124,7 +123,6 @@ impl Terrain {
 
         Terrain {
             vec: terrain_vec,
-            tile_count: 0,
             last_incl_dist: 0,
             last_obst_dist: 0,
             screen_size: screen_size,

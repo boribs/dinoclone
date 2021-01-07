@@ -77,7 +77,6 @@ impl Game {
             max_air_time: INITIAL_AIR_TIME,
             highscore: highscore,
             speed_mult: 1.0,
-            update_score: false,
         }
     }
 
@@ -94,7 +93,6 @@ impl Game {
     pub fn update_score(&mut self) {
         self.score += 1;
     }
-
 
     pub fn run(highscore: u32) {
         loop {
