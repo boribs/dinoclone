@@ -60,7 +60,10 @@ GENERAL DESIGN:
             * Obstacle spawn offset is determined by new_obstacle_distance, which depends on min_obstacle_distance.
 
     ✔ Score? @done(20-12-04 15:16)
-        ☐ Highscore: highlight terrain where the highscore is.
+        ✔ Highscores! @done(21-01-07 17:15)
+            ✔ Highlight terrain where the highscore is. @done(21-01-07 17:15)
+            ☐ Fix file saving the score higher (+1).
+            ☐ Add a description to the highscore file.
     ☐ Extended ASCII table for more characters.
         No idea...
     ✔ Pause. @done(20-12-02 22:34)
@@ -71,6 +74,8 @@ GENERAL DESIGN:
         ✘ Player color. @cancelled(21-01-03 23:47)
             Decided that the player character should stay white.
     ✔ Organize in multiple files (just because). @done(20-12-07 18:21)
+    ☐ Lower IY.
+    ✔ Move 'extern crate' statements to lib.rs. @done(21-01-06 19:51)
 
 REFACTOR:
     ✔ Make a lib.rs file and put there color-related stuff, constants and every other thing that's in main() that shouldn't be there (anything that's not main(), basically). @done(21-01-04 01:00) @critical

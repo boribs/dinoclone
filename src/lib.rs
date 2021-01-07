@@ -143,7 +143,7 @@ impl Game {
                     if !g.pause && player.state != p::PlayerState::Dead {
                         last_time = t;
 
-                        terrain.scroll_terrain();
+                        terrain.scroll_terrain(&g);
                         terrain.offset(&player);
 
                         player.update_pos(&terrain, &g);

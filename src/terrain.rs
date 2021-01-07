@@ -43,7 +43,7 @@ pub struct Terrain {
     pub roffset_y: i32,
     last_incl_dist: u32,
     last_obst_dist: u32,
-    screen_size: usize,
+    screen_count: u32,
     screen_dist: u32,
     screen_update_dist: u32,
 }
@@ -125,7 +125,7 @@ impl Terrain {
             vec: terrain_vec,
             last_incl_dist: 0,
             last_obst_dist: 0,
-            screen_size: screen_size,
+            screen_count: 0,
             screen_dist: 0,
             screen_update_dist: screen_size as u32 / 3,
             offset_y: 0,
@@ -162,7 +162,7 @@ impl Terrain {
         }
     }
 
-    pub fn generate_next_terrain_screen(&mut self) {
+    pub fn generate_next_terrain_screen(&mut self, g: &Game) {
         let mut t: Vec<TerrainUnit> = Vec::new();
         let perlin: Perlin = Perlin::new();
 
@@ -225,14 +225,26 @@ impl Terrain {
             last_obst = t[i].obstacle;
         }
 
+        self.screen_count += 1;
+
+        if g.highscore / (self.screen_update_dist + 1) as u32 == self.screen_count {
+            let j: usize = (g.highscore % (self.screen_update_dist + 1)) as usize;
+
+            t[j].tiles[0].color_pair_id = PAIR_WHITE;
+            t[j].tiles[1].tile_char = '!' as u32;
+            t[j].tiles[2].tile_char = '!' as u32;
+        }
+
+        t[0].tiles[0].tile_char = '=' as u32;
         self.vec.append(&mut t);
     }
 
-    pub fn scroll_terrain(&mut self) {
+    pub fn scroll_terrain(&mut self, g: &Game) {
         self.vec.remove(0);
 
         if self.screen_dist == self.screen_update_dist {
-            self.generate_next_terrain_screen();
+            self.generate_next_terrain_screen(g);
+            self.screen_dist = 0;
             return;
         }
 
