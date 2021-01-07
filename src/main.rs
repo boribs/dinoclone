@@ -2,14 +2,16 @@ extern crate chrono;
 extern crate ncurses;
 extern crate noise;
 extern crate rand;
-
-use ncurses::*;
+extern crate shellexpand;
 
 use dinoclone::*;
+use ncurses::*;
 
 fn main() {
     initscr();
-    raw();
+
+    let h = get_highscore();
+
     cbreak();
     nodelay(stdscr(), true);
     noecho();
@@ -17,7 +19,7 @@ fn main() {
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
     initialize_colors();
 
-    Game::run();
+    Game::run(h);
 
     nocbreak();
     endwin();

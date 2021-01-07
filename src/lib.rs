@@ -1,5 +1,8 @@
 use chrono::*;
 use ncurses::*;
+use std::fs;
+use std::io::ErrorKind;
+use std::io::Write;
 
 pub mod player;
 pub mod terrain;
@@ -28,6 +31,8 @@ pub const SPEED_MULT_CONST: f64 = 0.1;
 pub const INITIAL_SPEED: i64 = 100;
 pub const INITIAL_AIR_TIME: i32 = 7;
 
+const SAVE_FILE_PATH: &str = "~/.dinoclone";
+
 pub fn initialize_colors() {
     start_color();
 
@@ -43,7 +48,12 @@ pub fn draw(terrain: &t::Terrain, player: &p::Player, game_data: &Game) {
     terrain.draw_terrain();
     player.draw_player();
 
-    mvprintw(LINES() - 1, 0, &format!("Score: {}", game_data.score));
+    mvprintw(LINES() - 2, 0, &format!("Score: {}", game_data.score));
+    mvprintw(
+        LINES() - 1,
+        0,
+        &format!("Highscore: {}", game_data.highscore),
+    );
     refresh();
 }
 
@@ -53,18 +63,21 @@ pub struct Game {
     pub score: u32,
     pub speed: i64,
     pub max_air_time: i32,
+    pub highscore: u32,
     speed_mult: f64,
 }
 
 impl Game {
-    pub fn new() -> Self {
+    pub fn new(highscore: u32) -> Self {
         Game {
             playing: true,
             pause: false,
             score: 0,
             speed: INITIAL_SPEED,
-            speed_mult: 1.0,
             max_air_time: INITIAL_AIR_TIME,
+            highscore: highscore,
+            speed_mult: 1.0,
+            update_score: false,
         }
     }
 
@@ -82,9 +95,10 @@ impl Game {
         self.score += 1;
     }
 
-    pub fn run() {
+
+    pub fn run(highscore: u32) {
         loop {
-            let mut g = Game::new();
+            let mut g = Game::new(highscore);
             let mut terrain: t::Terrain = t::Terrain::new();
             let mut player: p::Player = p::Player::new();
 
@@ -141,6 +155,8 @@ impl Game {
                         break;
                     }
                 }
+
+                g.update_highscore();
             }
 
             // Death / quit loop
@@ -151,7 +167,9 @@ impl Game {
             );
 
             loop {
+                update_highscore_file(&g);
                 let key = getch();
+
                 if key == KEY_QUIT {
                     return;
                 } else if key == KEY_JUMP {
@@ -159,5 +177,62 @@ impl Game {
                 }
             }
         }
+    }
+
+    fn update_highscore(&mut self) {
+        if self.score > self.highscore {
+            self.highscore = self.score;
+        }
+    }
+}
+
+pub fn get_highscore() -> u32 {
+    let p: &str = &shellexpand::tilde(SAVE_FILE_PATH).to_string();
+
+    let h: String = fs::read_to_string(p).unwrap_or_else(|e| {
+        if e.kind() == ErrorKind::NotFound {
+            create_highscore_file(p);
+        } else {
+            mvprintw(0, 0, &format!("Error reading the save file: {}\n", e));
+            addstr("Press any key to continue.");
+            getch();
+        }
+
+        "0".to_string()
+    });
+
+    if h.is_empty() {
+        return 0;
+    }
+
+    h.parse::<u32>().unwrap_or_else(|e| {
+        mvprintw(1, 0, &format!("Error parsing the save file: {}\n", e));
+        addstr("The current value will be overwritten. Press any key to continue.");
+        getch();
+
+        0
+    })
+}
+
+fn create_highscore_file(path: &str) {
+    let f = fs::File::create(path);
+
+    match f {
+        Ok(mut file) => {
+            file.write(b"0").unwrap();
+            ()
+        }
+        Err(e) => {
+            mvprintw(0, 0, &format!("Error creating the save file: {}\n", e));
+            addstr("Press any key to continue.");
+            getch();
+        }
+    };
+}
+
+pub fn update_highscore_file(g: &Game) {
+    if g.score >= g.highscore {
+        let p: &str = &shellexpand::tilde(SAVE_FILE_PATH).to_string();
+        fs::write(p, g.highscore.to_string()).unwrap();
     }
 }
