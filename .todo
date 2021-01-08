@@ -74,7 +74,7 @@ GENERAL DESIGN:
         ✘ Player color. @cancelled(21-01-03 23:47)
             Decided that the player character should stay white.
     ✔ Organize in multiple files (just because). @done(20-12-07 18:21)
-    ☐ Lower IY.
+    ✔ Lower IY. @done(21-01-07 18:02)
     ✔ Move 'extern crate' statements to lib.rs. @done(21-01-06 19:51)
 
 REFACTOR:

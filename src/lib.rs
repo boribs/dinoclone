@@ -21,7 +21,7 @@ pub const KEY_QUIT: i32 = 'q' as i32;
 pub const KEY_PAUSE: i32 = 'p' as i32;
 pub const KEY_JUMP: i32 = 'j' as i32;
 
-pub const IY: i32 = 6;
+pub const IY: i32 = 9;
 pub const IX: i32 = 1;
 pub const PX: i32 = 23;
 
