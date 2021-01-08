@@ -43,9 +43,6 @@ pub struct Terrain {
     pub roffset_y: i32,
     last_incl_dist: u32,
     last_obst_dist: u32,
-    screen_count: u32,
-    screen_dist: u32,
-    screen_update_dist: u32,
 }
 
 impl TerrainTile {
@@ -119,15 +116,10 @@ impl Terrain {
             COLS() as usize / 3
         ]);
 
-        let screen_size = COLS() as usize;
-
         Terrain {
             vec: terrain_vec,
             last_incl_dist: 0,
             last_obst_dist: 0,
-            screen_count: 0,
-            screen_dist: 0,
-            screen_update_dist: screen_size as u32 / 3,
             offset_y: 0,
             roffset_y: 0,
         }
@@ -162,7 +154,7 @@ impl Terrain {
         }
     }
 
-    pub fn generate_next_terrain_screen(&mut self, g: &Game) {
+    pub fn generate_next_terrain_screen(&mut self, g: &mut Game) {
         let mut t: Vec<TerrainUnit> = Vec::new();
         let perlin: Perlin = Perlin::new();
 
@@ -177,7 +169,7 @@ impl Terrain {
         let mut next_obst_len: u32 = rng.gen_range(2, MAX_OBST_LENGHT + 1);
         let mut obst_len: u32 = 0;
 
-        for i in 0..self.screen_update_dist as usize + 1 {
+        for i in 0..g.screen_update_dist as usize + 1 {
             let v: f64 = perlin.get([X_STEP * i as f64 + n, Y_STEP * i as f64 + n]);
 
             if v <= MIN_FLAT && last_type != TerrainType::Up && !last_obst {
@@ -225,10 +217,10 @@ impl Terrain {
             last_obst = t[i].obstacle;
         }
 
-        self.screen_count += 1;
+        g.screen_count += 1;
 
-        if g.highscore / (self.screen_update_dist + 1) as u32 == self.screen_count {
-            let j: usize = (g.highscore % (self.screen_update_dist + 1)) as usize;
+        if g.highscore / (g.screen_update_dist + 1) as u32 == g.screen_count {
+            let j: usize = (g.highscore % (g.screen_update_dist + 1)) as usize;
 
             t[j].tiles[0].color_pair_id = PAIR_WHITE;
             t[j].tiles[1].tile_char = '!' as u32;
@@ -238,16 +230,16 @@ impl Terrain {
         self.vec.append(&mut t);
     }
 
-    pub fn scroll_terrain(&mut self, g: &Game) {
+    pub fn scroll_terrain(&mut self, g: &mut Game) {
         self.vec.remove(0);
 
-        if self.screen_dist == self.screen_update_dist {
+        if g.screen_dist == g.screen_update_dist {
             self.generate_next_terrain_screen(g);
-            self.screen_dist = 0;
+            g.screen_dist = 0;
             return;
         }
 
-        self.screen_dist += 1;
+        g.screen_dist += 1;
     }
 
     pub fn offset(&mut self, p: &p::Player) {

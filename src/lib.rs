@@ -64,6 +64,9 @@ pub struct Game {
     pub speed: i64,
     pub max_air_time: i32,
     pub highscore: u32,
+    pub screen_count: u32,
+    pub screen_dist: u32,
+    pub screen_update_dist: u32,
     speed_mult: f64,
     tile_count: u32,
 }
@@ -77,6 +80,9 @@ impl Game {
             speed: INITIAL_SPEED,
             max_air_time: INITIAL_AIR_TIME,
             highscore: highscore,
+            screen_count: 0,
+            screen_dist: 0,
+            screen_update_dist: COLS() as u32 / 3,
             speed_mult: 1.0,
             tile_count: 0,
         }
@@ -145,7 +151,7 @@ impl Game {
                     if !g.pause && player.state != p::PlayerState::Dead {
                         last_time = t;
 
-                        terrain.scroll_terrain(&g);
+                        terrain.scroll_terrain(&mut g);
                         terrain.offset(&player);
 
                         player.update_pos(&terrain, &g);
