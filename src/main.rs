@@ -11,9 +11,6 @@ fn main() {
     initscr();
 
     let h = get_highscore();
-
-    cbreak();
-    nodelay(stdscr(), true);
     noecho();
 
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
@@ -21,6 +18,5 @@ fn main() {
 
     Game::run(h);
 
-    nocbreak();
     endwin();
 }

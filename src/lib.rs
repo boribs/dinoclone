@@ -101,6 +101,8 @@ impl Game {
     }
 
     pub fn run(highscore: u32) {
+        nodelay(stdscr(), true);
+
         loop {
             let mut g = Game::new(highscore);
             let mut terrain: t::Terrain = t::Terrain::new();
@@ -170,16 +172,16 @@ impl Game {
                 "PRESS 'JUMP' TO START AGAIN, 'QUIT' TO QUIT",
             );
 
-            loop {
-                update_highscore_file(&g);
-                let key = getch();
+            nodelay(stdscr(), false);
+            update_highscore_file(&g);
 
-                if key == KEY_QUIT {
-                    return;
-                } else if key == KEY_JUMP {
-                    Game::run(g.highscore - 1);
-                    return;
-                }
+            let key = getch();
+
+            if key == KEY_QUIT {
+                return;
+            } else if key == KEY_JUMP {
+                Game::run(g.highscore - 1);
+                return;
             }
         }
     }
