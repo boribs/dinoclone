@@ -63,7 +63,8 @@ GENERAL DESIGN:
         ✔ Highscores! @done(21-01-07 17:15)
             ✔ Highlight terrain where the highscore is. @done(21-01-07 17:15)
             ✔ Fix file saving the score higher (+1). @done(21-01-07 18:14)
-            ✔ Fix the game not updating the highscore after a new game. @done(21-01-07 18:20)
+            ✔ Fix the game not updating the highscore after a new game. @done(21-01-08 15:08)
+            ☐ Limit highscore saving: It can't be less than the screen update distance (width / 3).
             ☐ Add a description to the highscore file.
     ☐ Extended ASCII table for more characters.
         No idea...

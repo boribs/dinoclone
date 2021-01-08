@@ -165,7 +165,6 @@ impl Game {
                 g.update_highscore();
             }
 
-            // Death / quit loop
             mvprintw(
                 2 * LINES() / 3,
                 COLS() / 2 - 23,
