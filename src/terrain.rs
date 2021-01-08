@@ -235,7 +235,6 @@ impl Terrain {
             t[j].tiles[2].tile_char = '!' as u32;
         }
 
-        t[0].tiles[0].tile_char = '=' as u32;
         self.vec.append(&mut t);
     }
 
