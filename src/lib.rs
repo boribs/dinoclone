@@ -177,7 +177,8 @@ impl Game {
                 if key == KEY_QUIT {
                     return;
                 } else if key == KEY_JUMP {
-                    break; // reset
+                    Game::run(g.highscore - 1);
+                    return;
                 }
             }
         }

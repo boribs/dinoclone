@@ -62,7 +62,8 @@ GENERAL DESIGN:
     ✔ Score? @done(20-12-04 15:16)
         ✔ Highscores! @done(21-01-07 17:15)
             ✔ Highlight terrain where the highscore is. @done(21-01-07 17:15)
-            ✔ Fix§ file saving the score higher (+1). @done(21-01-07 18:14)
+            ✔ Fix file saving the score higher (+1). @done(21-01-07 18:14)
+            ✔ Fix the game not updating the highscore after a new game. @done(21-01-07 18:20)
             ☐ Add a description to the highscore file.
     ☐ Extended ASCII table for more characters.
         No idea...
@@ -76,6 +77,7 @@ GENERAL DESIGN:
     ✔ Organize in multiple files (just because). @done(20-12-07 18:21)
     ✔ Lower IY. @done(21-01-07 18:02)
     ✔ Move 'extern crate' statements to lib.rs. @done(21-01-06 19:51)
+    ☐ Change the highscore file to also save controls and general configuration.
 
 REFACTOR:
     ✔ Make a lib.rs file and put there color-related stuff, constants and every other thing that's in main() that shouldn't be there (anything that's not main(), basically). @done(21-01-04 01:00) @critical
