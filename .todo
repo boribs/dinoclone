@@ -62,7 +62,7 @@ GENERAL DESIGN:
     ✔ Score? @done(20-12-04 15:16)
         ✔ Highscores! @done(21-01-07 17:15)
             ✔ Highlight terrain where the highscore is. @done(21-01-07 17:15)
-            ☐ Fix file saving the score higher (+1).
+            ✔ Fix§ file saving the score higher (+1). @done(21-01-07 18:14)
             ☐ Add a description to the highscore file.
     ☐ Extended ASCII table for more characters.
         No idea...

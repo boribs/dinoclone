@@ -237,6 +237,6 @@ fn create_highscore_file(path: &str) {
 pub fn update_highscore_file(g: &Game) {
     if g.score >= g.highscore {
         let p: &str = &shellexpand::tilde(SAVE_FILE_PATH).to_string();
-        fs::write(p, g.highscore.to_string()).unwrap();
+        fs::write(p, (g.highscore - 1).to_string()).unwrap();
     }
 }
