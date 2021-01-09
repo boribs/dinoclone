@@ -13,9 +13,8 @@ pub use terrain as t;
 // Color stuff
 pub const PAIR_WHITE: i16 = 0;
 pub const PAIR_GREEN: i16 = 1;
-pub const PAIR_YELLOW: i16 = 2;
-pub const PAIR_RED: i16 = 3;
-pub const PAIR_BLUE: i16 = 4;
+pub const PAIR_RED: i16 = 2;
+pub const PAIR_BLUE: i16 = 3;
 
 pub const KEY_QUIT: i32 = 'q' as i32;
 pub const KEY_PAUSE: i32 = 'p' as i32;
@@ -38,7 +37,6 @@ pub fn initialize_colors() {
 
     init_pair(PAIR_WHITE, COLOR_WHITE, COLOR_BLACK);
     init_pair(PAIR_GREEN, COLOR_GREEN, COLOR_BLACK);
-    init_pair(PAIR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
     init_pair(PAIR_RED, COLOR_RED, COLOR_BLACK);
     init_pair(PAIR_BLUE, COLOR_BLUE, COLOR_BLACK);
 }
