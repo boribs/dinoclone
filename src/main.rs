@@ -1,9 +1,3 @@
-extern crate chrono;
-extern crate ncurses;
-extern crate noise;
-extern crate rand;
-extern crate shellexpand;
-
 use dinoclone::*;
 use ncurses::*;
 

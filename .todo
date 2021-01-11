@@ -19,6 +19,7 @@ GENERAL DESIGN:
             * Also fixed clipping issues when Jumping and during MaxHeight.
             ✔ Smoother scrolling up/down when offsetting the player. @high @done(20-12-03 12:03)
             ✔ "Remember" the player wanted to jump (if climbing) and jump ASAP. @done(20-12-07 14:23)
+            ☐ Smooth scroll when the player's flat with the ground.
         ✔ Obstacle collision. @critical @done(20-12-03 19:05)
 
     TERRAIN:

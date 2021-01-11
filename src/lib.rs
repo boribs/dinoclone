@@ -1,3 +1,9 @@
+extern crate chrono;
+extern crate ncurses;
+extern crate noise;
+extern crate rand;
+extern crate shellexpand;
+
 use chrono::*;
 use ncurses::*;
 use std::fs;
