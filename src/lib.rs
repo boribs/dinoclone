@@ -5,10 +5,10 @@ extern crate shellexpand;
 
 use ncurses::*;
 use std::fs;
-use std::thread;
-use std::time;
 use std::io::ErrorKind;
 use std::io::Write;
+use std::thread;
+use std::time;
 
 pub mod player;
 pub mod terrain;
@@ -149,7 +149,6 @@ impl Game {
                 }
 
                 if !g.pause && player.state != p::PlayerState::Dead {
-
                     terrain.scroll_terrain(&mut g);
                     terrain.offset(&player);
 
