@@ -1,12 +1,12 @@
-extern crate chrono;
 extern crate ncurses;
 extern crate noise;
 extern crate rand;
 extern crate shellexpand;
 
-use chrono::*;
 use ncurses::*;
 use std::fs;
+use std::thread;
+use std::time;
 use std::io::ErrorKind;
 use std::io::Write;
 
@@ -118,8 +118,6 @@ impl Game {
             let mut terrain: t::Terrain = t::Terrain::new();
             let mut player: p::Player = p::Player::new();
 
-            let mut last_time = offset::Local::now();
-
             // Start menu loop
             draw(&terrain, &player, &g);
             mvprintw(
@@ -150,27 +148,24 @@ impl Game {
                     g.pause = !g.pause;
                 }
 
-                let t = offset::Local::now();
-                if t >= last_time + Duration::milliseconds(g.speed) {
-                    if !g.pause && player.state != p::PlayerState::Dead {
-                        last_time = t;
+                if !g.pause && player.state != p::PlayerState::Dead {
 
-                        terrain.scroll_terrain(&mut g);
-                        terrain.offset(&player);
+                    terrain.scroll_terrain(&mut g);
+                    terrain.offset(&player);
 
-                        player.update_pos(&terrain, &g);
-                        draw(&terrain, &player, &g);
+                    player.update_pos(&terrain, &g);
+                    draw(&terrain, &player, &g);
 
-                        terrain.roffset();
-                        g.update_speed();
-                        g.update_score();
-                    } else if g.pause {
-                        mvprintw(0, (COLS() / 2) - 3, "PAUSE");
-                    } else {
-                        mvprintw(0, (COLS() / 2) - 3, "DEAD");
-                        break;
-                    }
+                    terrain.roffset();
+                    g.update_speed();
+                    g.update_score();
+                } else if g.pause {
+                    mvprintw(0, (COLS() / 2) - 3, "PAUSE");
+                } else {
+                    mvprintw(0, (COLS() / 2) - 3, "DEAD");
+                    break;
                 }
+                thread::sleep(time::Duration::from_millis(g.speed as u64));
 
                 g.update_highscore();
             }
