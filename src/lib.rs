@@ -37,6 +37,7 @@ pub const INITIAL_SPEED: i64 = 100;
 pub const INITIAL_AIR_TIME: i32 = 7;
 
 const SAVE_FILE_PATH: &str = "~/.dinoclone";
+const AUTOPLAY: bool = false;
 
 pub fn initialize_colors() {
     start_color();
@@ -146,6 +147,10 @@ impl Game {
                     player.jump(&terrain);
                 } else if key == KEY_PAUSE && player.state != p::PlayerState::Dead {
                     g.pause = !g.pause;
+                }
+
+                if AUTOPLAY && terrain.vec[PX as usize + 3].obstacle && !g.pause {
+                    player.jump(&terrain);
                 }
 
                 if !g.pause && player.state != p::PlayerState::Dead {
