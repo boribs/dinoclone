@@ -12,6 +12,7 @@ use std::time;
 
 pub mod player;
 pub mod terrain;
+mod bot;
 
 pub use player as p;
 pub use terrain as t;
@@ -149,8 +150,8 @@ impl Game {
                     g.pause = !g.pause;
                 }
 
-                if AUTOPLAY && terrain.vec[PX as usize + 3].obstacle && !g.pause {
-                    player.jump(&terrain);
+                if AUTOPLAY {
+                    bot::autoplay(&mut player, &terrain);
                 }
 
                 if !g.pause && player.state != p::PlayerState::Dead {
