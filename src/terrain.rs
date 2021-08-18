@@ -10,15 +10,18 @@ const MAX_FLAT: f64 = 0.46;
 const X_STEP: f64 = 0.15;
 const Y_STEP: f64 = 0.03;
 
-const MAX_OBST_LENGHT: u32 = 5;
-const MIN_OBST_DIST: u32 = 40;
+const MIN_OBST_LENGTH: u32 = 3;
+const MAX_OBST_LENGTH: u32 = 6;
+
+const MIN_OBST_DIST: u32 = 7;
+const MAX_OBST_DIST: u32 = 70;
 const MIN_INCL_DIST: u32 = 2;
 
 const OBSTACLE_CHAR: u32 = '#' as u32;
 
 #[derive(Copy, Clone)]
-struct TerrainTile {
-    tile_char: u32,
+pub struct TerrainTile {
+    pub tile_char: u32,
     color_pair_id: i16,
 }
 
@@ -31,7 +34,7 @@ pub enum TerrainType {
 
 #[derive(Copy, Clone)]
 pub struct TerrainUnit {
-    tiles: [TerrainTile; 3],
+    pub tiles: [TerrainTile; 3],
     pub unit_type: TerrainType,
     pub initial_y: i32,
     pub obstacle: bool,
@@ -166,7 +169,8 @@ impl Terrain {
         let mut last_y: i32 = last_unit.initial_y;
         let mut last_obst: bool = last_unit.obstacle;
 
-        let mut next_obst_len: u32 = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+        let mut next_obst_len: u32 = rng.gen_range(MIN_OBST_LENGTH, MAX_OBST_LENGTH);
+        let mut next_obst_dist: u32 = rng.gen_range(MIN_OBST_DIST, MAX_OBST_DIST);
         let mut obst_len: u32 = 0;
 
         for i in 0..g.screen_update_dist as usize + 1 {
@@ -191,7 +195,7 @@ impl Terrain {
             } else {
                 let mut spawn_obst: bool = false;
 
-                if self.last_obst_dist > MIN_OBST_DIST
+                if self.last_obst_dist > next_obst_dist
                     && self.last_incl_dist > MIN_INCL_DIST
                     && obst_len < next_obst_len
                 {
@@ -200,7 +204,8 @@ impl Terrain {
                 } else if obst_len == next_obst_len {
                     obst_len = 0;
                     self.last_obst_dist = 0;
-                    next_obst_len = rng.gen_range(2, MAX_OBST_LENGHT + 1);
+                    next_obst_len = rng.gen_range(MIN_OBST_LENGTH, MAX_OBST_LENGTH);
+                    next_obst_dist = rng.gen_range(MIN_OBST_DIST, MAX_OBST_DIST);
                 }
 
                 self.last_obst_dist += 1;
@@ -227,6 +232,10 @@ impl Terrain {
             t[j].tiles[2].tile_char = '!' as u32;
         }
 
+
+        if last_obst {
+            self.last_obst_dist = 0;
+        }
         self.vec.append(&mut t);
     }
 
