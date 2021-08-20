@@ -13,9 +13,9 @@ const Y_STEP: f64 = 0.03;
 const MIN_OBST_LENGTH: u32 = 3;
 const MAX_OBST_LENGTH: u32 = 6;
 
-const MIN_OBST_DIST: u32 = 7;
-const MAX_OBST_DIST: u32 = 70;
-const MIN_INCL_DIST: u32 = 2;
+const MIN_OBST_DIST: u32 = 6;
+const MAX_OBST_DIST: u32 = 80;
+const MIN_INCL_DIST: u32 = 4;
 
 const OBSTACLE_CHAR: u32 = '#' as u32;
 
@@ -198,6 +198,7 @@ impl Terrain {
                 if self.last_obst_dist > next_obst_dist
                     && self.last_incl_dist > MIN_INCL_DIST
                     && obst_len < next_obst_len
+                    && i as u32 + obst_len < g.screen_update_dist
                 {
                     spawn_obst = true;
                     obst_len += 1;
@@ -231,7 +232,6 @@ impl Terrain {
             t[j].tiles[1].tile_char = '!' as u32;
             t[j].tiles[2].tile_char = '!' as u32;
         }
-
 
         if last_obst {
             self.last_obst_dist = 0;
