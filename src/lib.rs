@@ -151,7 +151,7 @@ impl Game {
                 }
 
                 if AUTOPLAY {
-                    bot::autoplay(&mut player, &terrain);
+                    bot::autoplay(&mut player, &terrain, &g);
                 }
 
                 if !g.pause && player.state != p::PlayerState::Dead {
